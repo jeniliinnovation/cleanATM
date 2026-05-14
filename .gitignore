@@ -1,0 +1,9 @@
+node_modules/
+.env
+uploads/
+temp1/
+temp_docx/
+*.zip
+*.docx
+doc1.txt
+doc2.txt

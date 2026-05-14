@@ -1,0 +1,458 @@
+openapi: 3.0.0
+info:
+  title: ATM CleanGuard API Documentation
+  version: 1.0.0
+  description: ATM CleanGuard is a digital complaint management system for reporting ATM cleanliness and maintenance issues.
+servers:
+  - url: /v1
+    description: API v1
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user account
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                email: { type: string }
+                mobile: { type: string }
+                password: { type: string }
+                password_confirmation: { type: string }
+      responses:
+        "201": { description: Registration successful }
+  /auth/login:
+    post:
+      summary: Authenticate and get JWT token
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        "200": { description: Login successful }
+  /auth/logout:
+    post:
+      summary: User logout
+      tags: [Auth]
+      responses:
+        "200": { description: Logged out }
+  /auth/forgot-password:
+    post:
+      summary: Request password reset
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string }
+      responses:
+        "200": { description: Reset link sent }
+  /auth/reset-password:
+    post:
+      summary: Reset password
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token: { type: string }
+                password: { type: string }
+                password_confirmation: { type: string }
+      responses:
+        "200": { description: Password reset }
+  /user/profile:
+    get:
+      summary: Get user profile details
+      tags: [User Profile]
+      responses:
+        "200": { description: OK }
+    put:
+      summary: Update profile info
+      tags: [User Profile]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                mobile: { type: string }
+      responses:
+        "200": { description: Success }
+  /user/change-password:
+    put:
+      summary: Change user password
+      tags: [User Profile]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                current_password: { type: string }
+                new_password: { type: string }
+                new_password_confirmation: { type: string }
+      responses:
+        "200": { description: Password changed }
+  /user/account:
+    delete:
+      summary: Delete account
+      tags: [User Profile]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password: { type: string }
+      responses:
+        "200": { description: Account deleted }
+  /atms:
+    get:
+      summary: List all ATMs
+      tags: [ATM Locations]
+      parameters:
+        - in: query
+          name: city
+          schema: { type: string }
+        - in: query
+          name: bank
+          schema: { type: string }
+        - in: query
+          name: page
+          schema: { type: integer }
+      responses:
+        "200": { description: List of ATMs }
+  /atms/nearby:
+    get:
+      summary: Search ATMs Nearby
+      tags: [ATM Locations]
+      parameters:
+        - in: query
+          name: latitude
+          required: true
+          schema: { type: number, format: float }
+        - in: query
+          name: longitude
+          required: true
+          schema: { type: number, format: float }
+        - in: query
+          name: radius_km
+          schema: { type: number, format: float }
+      responses:
+        "200": { description: List of nearby ATMs }
+  /atms/{atm_id}:
+    get:
+      summary: Get ATM Details
+      tags: [ATM Locations]
+      parameters:
+        - in: path
+          name: atm_id
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: ATM object }
+  /atms/{atm_id}/complaints:
+    get:
+      summary: Get complaint history of ATM
+      tags: [ATM Locations]
+      parameters:
+        - in: path
+          name: atm_id
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: List of anonymized complaints }
+  /complaints:
+    post:
+      summary: Submit a new complaint
+      tags: [Complaints]
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                atm_id: { type: string }
+                description: { type: string }
+                complaint_type: { type: string, enum: [dirty, ac_issue, garbage, damage, no_power, other] }
+                photo: { type: string, format: binary }
+      responses:
+        "201": { description: Submission successful }
+    get:
+      summary: Get all my complaints
+      tags: [Complaints]
+      parameters:
+        - in: query
+          name: status
+          schema: { type: string }
+        - in: query
+          name: page
+          schema: { type: integer }
+      responses:
+        "200": { description: OK }
+  /complaints/{complaint_id}:
+    get:
+      summary: Get Complaint Details
+      tags: [Complaints]
+      parameters:
+        - in: path
+          name: complaint_id
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: OK }
+    put:
+      summary: Update complaint
+      tags: [Complaints]
+      parameters:
+        - in: path
+          name: complaint_id
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                description: { type: string }
+                photo: { type: string, format: binary }
+      responses:
+        "200": { description: OK }
+    delete:
+      summary: Delete a complaint
+      tags: [Complaints]
+      parameters:
+        - in: path
+          name: complaint_id
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: OK }
+  /complaints/{complaint_id}/photo:
+    get:
+      summary: Get complaint photo
+      tags: [Complaints]
+      parameters:
+        - in: path
+          name: complaint_id
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: Photo binary }
+  /admin/auth/login:
+    post:
+      summary: Admin login
+      tags: [Admin]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string }
+                password: { type: string }
+                bank_code: { type: string }
+      responses:
+        "200": { description: OK }
+  /admin/complaints:
+    get:
+      summary: View all complaints for this bank branch
+      tags: [Admin]
+      parameters:
+        - in: query
+          name: status
+          schema: { type: string }
+        - in: query
+          name: atm_id
+          schema: { type: string }
+        - in: query
+          name: from_date
+          schema: { type: string, format: date }
+        - in: query
+          name: to_date
+          schema: { type: string, format: date }
+        - in: query
+          name: page
+          schema: { type: integer }
+      responses:
+        "200": { description: OK }
+  /admin/complaints/{complaint_id}:
+    get:
+      summary: Complaint detail (admin)
+      tags: [Admin]
+      parameters:
+        - in: path
+          name: complaint_id
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: OK }
+  /admin/complaints/{complaint_id}/status:
+    put:
+      summary: Update complaint status
+      tags: [Admin]
+      parameters:
+        - in: path
+          name: complaint_id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status: { type: string, enum: [in_progress, resolved, rejected] }
+                remarks: { type: string }
+                resolved_at: { type: string, format: date-time }
+      responses:
+        "200": { description: OK }
+  /admin/stats:
+    get:
+      summary: Complaint Statistics
+      tags: [Admin]
+      responses:
+        "200": { description: OK }
+  /admin/atms:
+    post:
+      summary: Add ATM location
+      tags: [Admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                atm_id: { type: string }
+                bank_name: { type: string }
+                bank_code: { type: string }
+                branch_email: { type: string }
+                address: { type: string }
+                city: { type: string }
+                state: { type: string }
+                latitude: { type: number, format: float }
+                longitude: { type: number, format: float }
+      responses:
+        "201": { description: Created }
+  /admin/atms/{atm_id}:
+    put:
+      summary: Update ATM location
+      tags: [Admin]
+      parameters:
+        - in: path
+          name: atm_id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bank_name: { type: string }
+      responses:
+        "200": { description: OK }
+    delete:
+      summary: Remove ATM location
+      tags: [Admin]
+      parameters:
+        - in: path
+          name: atm_id
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: OK }
+  /notifications:
+    get:
+      summary: Fetch Notifications
+      tags: [Notifications]
+      parameters:
+        - in: query
+          name: is_read
+          schema: { type: boolean }
+        - in: query
+          name: page
+          schema: { type: integer }
+      responses:
+        "200": { description: OK }
+  /notifications/{id}/read:
+    put:
+      summary: Mark notification read
+      tags: [Notifications]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: OK }
+  /notifications/read-all:
+    put:
+      summary: Mark all read
+      tags: [Notifications]
+      responses:
+        "200": { description: OK }
+  /notifications/{id}:
+    delete:
+      summary: Delete notification
+      tags: [Notifications]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: OK }
+  /notifications/register-device:
+    post:
+      summary: Register FCM device token
+      tags: [Notifications]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fcm_token: { type: string }
+                device_type: { type: string }
+      responses:
+        "200": { description: OK }
