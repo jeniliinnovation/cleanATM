@@ -1,6 +1,8 @@
-const Complaint = require('../models/Complaint');
 const path = require('path');
 const fs = require('fs');
+const ATM = require('../models/ATM');
+const User = require('../models/User');
+const Notification = require('../models/Notification');
 
 exports.submitComplaint = async (req, res) => {
   try {
@@ -18,6 +20,30 @@ exports.submitComplaint = async (req, res) => {
       complaint_type,
       photo_url
     });
+
+    // Notify relevant Bank Managers
+    try {
+      const targetAtm = await ATM.findByPk(atm_id);
+      if (targetAtm && targetAtm.bank_code) {
+        const managers = await User.findAll({
+          where: { 
+            role: 'admin', 
+            bank_code: targetAtm.bank_code 
+          }
+        });
+
+        for (const manager of managers) {
+          await Notification.create({
+            user_id: manager.user_id,
+            message: `New ${complaint_type.replace('_', ' ')} complaint filed for ATM: ${atm_id}`,
+            type: 'new_complaint',
+            is_read: false
+          });
+        }
+      }
+    } catch (notifyErr) {
+      console.error('Failed to send manager notifications:', notifyErr);
+    }
 
     res.status(201).json({ success: true, message: 'Complaint submitted successfully', data: complaint });
   } catch (error) {

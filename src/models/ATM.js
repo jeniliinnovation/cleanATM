@@ -15,6 +15,10 @@ const ATM = sequelize.define('ATM', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  branch_code: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   branch_email: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -38,6 +42,10 @@ const ATM = sequelize.define('ATM', {
   longitude: {
     type: DataTypes.FLOAT,
     allowNull: true,
+  },
+  status: {
+    type: DataTypes.ENUM('clean', 'dirty', 'maintenance'),
+    defaultValue: 'clean'
   }
 }, {
   timestamps: true,

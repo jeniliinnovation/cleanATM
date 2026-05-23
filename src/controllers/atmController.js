@@ -12,6 +12,11 @@ exports.listAtms = async (req, res) => {
     if (city) whereClause.city = { [Op.like]: `%${city}%` };
     if (bank) whereClause.bank_name = { [Op.like]: `%${bank}%` };
 
+    // Filter by bank_code for bank managers
+    if (req.user && req.user.bank_code && req.user.bank_code !== 'DEFAULT') {
+      whereClause.bank_code = req.user.bank_code;
+    }
+
     const { count, rows } = await ATM.findAndCountAll({
       where: whereClause,
       limit,
