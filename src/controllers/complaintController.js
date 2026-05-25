@@ -3,6 +3,7 @@ const fs = require('fs');
 const ATM = require('../models/ATM');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
+const Complaint = require('../models/Complaint');
 
 exports.submitComplaint = async (req, res) => {
   try {
@@ -64,6 +65,7 @@ exports.getComplaints = async (req, res) => {
 
     const { count, rows } = await Complaint.findAndCountAll({
       where: whereClause,
+      include: [ATM],
       limit,
       offset,
       order: [['createdAt', 'DESC']]
