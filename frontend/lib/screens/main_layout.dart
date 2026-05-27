@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../../utils/app_colors.dart';
 import 'home/home_screen.dart';
 import 'home/atm_list_screen.dart';
 import 'complaints/my_complaints_screen.dart';
@@ -19,7 +18,7 @@ class _MainLayoutState extends State<MainLayout> {
 
   List<Widget> get _pages => [
     HomeScreen(onNavigateToTab: _onItemTapped),
-    const AtmListScreen(),
+    AtmListScreen(onNavigateToTab: _onItemTapped),
     const MyComplaintsScreen(),
     const ProfileScreen(),
   ];
@@ -40,16 +39,19 @@ class _MainLayoutState extends State<MainLayout> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Container(
-        height: 68,
-        width: 68,
-        margin: const EdgeInsets.only(top: 10),
+        height: 70,
+        width: 70,
+        margin: const EdgeInsets.only(top: 15),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
+          gradient: const LinearGradient(
+            colors: [Color(0xFF10B981), Color(0xFF059669)],
+          ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withOpacity(0.4),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
+              color: const Color(0xFF10B981).withOpacity(0.35),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
@@ -57,45 +59,42 @@ class _MainLayoutState extends State<MainLayout> {
           onPressed: () {
             Navigator.push(context, MaterialPageRoute(builder: (_) => const FileReportScreen()));
           },
-          backgroundColor: AppColors.primary,
+          backgroundColor: Colors.transparent,
           elevation: 0,
+          highlightElevation: 0,
           shape: const CircleBorder(),
-          child: const Icon(Icons.add_rounded, size: 36, color: Colors.white),
+          child: const Icon(Icons.add_rounded, size: 38, color: Colors.white),
         ),
       ),
       bottomNavigationBar: Container(
-        height: 85,
-        margin: const EdgeInsets.fromLTRB(20, 0, 20, 25),
+        height: 95,
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 20),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.7),
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: Colors.white.withOpacity(0.35), width: 1.5),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.06),
               blurRadius: 25,
-              offset: const Offset(0, 8),
+              offset: const Offset(0, -5),
             ),
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(30),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-            child: BottomAppBar(
-              elevation: 0,
-              color: Colors.transparent,
-              notchMargin: 10,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildNavItem(Icons.home_rounded, Icons.home_outlined, 'Home', 0),
-                  _buildNavItem(Icons.atm_rounded, Icons.atm_outlined, 'ATMs', 1),
-                  const SizedBox(width: 40), // Space for FAB
-                  _buildNavItem(Icons.assignment_rounded, Icons.assignment_outlined, 'Complaints', 2),
-                  _buildNavItem(Icons.person_rounded, Icons.person_outlined, 'Profile', 3),
-                ],
-              ),
+          borderRadius: BorderRadius.circular(28),
+          child: BottomAppBar(
+            elevation: 0,
+            color: Colors.white,
+            padding: EdgeInsets.zero,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildNavItem(Icons.grid_view_rounded, Icons.grid_view_rounded, 'Home', 0),
+                _buildNavItem(Icons.account_balance_rounded, Icons.account_balance_outlined, 'Banks', 1),
+                const SizedBox(width: 60), // Space for FAB
+                _buildNavItem(Icons.assignment_rounded, Icons.assignment_outlined, 'History', 2),
+                _buildNavItem(Icons.person_rounded, Icons.person_outlined, 'Profile', 3),
+              ],
             ),
           ),
         ),
@@ -105,36 +104,34 @@ class _MainLayoutState extends State<MainLayout> {
 
   Widget _buildNavItem(IconData activeIcon, IconData inactiveIcon, String label, int index) {
     final isSelected = _selectedIndex == index;
-    return GestureDetector(
-      onTap: () => _onItemTapped(index),
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: isSelected ? AppColors.primary.withOpacity(0.12) : Colors.transparent,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(
+    final color = isSelected ? const Color(0xFF10B981) : const Color(0xFF94A3B8);
+    
+    return Expanded(
+      child: InkWell(
+        onTap: () => _onItemTapped(index),
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
               isSelected ? activeIcon : inactiveIcon,
               size: 24,
-              color: isSelected ? AppColors.primary : AppColors.textSecondary.withOpacity(0.5),
+              color: color,
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-              color: isSelected ? AppColors.primary : AppColors.textSecondary.withOpacity(0.5),
-              letterSpacing: 0.2,
+            const SizedBox(height: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
+                color: color,
+                letterSpacing: 0.2,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

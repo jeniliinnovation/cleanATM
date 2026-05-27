@@ -7,86 +7,155 @@ class HelpSupportScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Help / Support', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_rounded, color: Colors.black),
           onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'Help / Support',
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w800, fontSize: 18),
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(24),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Help Card
             Container(
+              width: double.infinity,
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(16),
+                gradient: const LinearGradient(
+                  colors: [AppColors.primary, Color(0xFF10B981)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 8)),
+                ],
               ),
-              child: Row(
+              child: const Row(
                 children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text('Need Help?', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                        SizedBox(height: 8),
-                        Text('We are here to assist you...', style: TextStyle(color: Colors.white70, fontSize: 14)),
+                      children: [
+                        Text(
+                          'Need Help?',
+                          style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900),
+                        ),
+                        SizedBox(height: 6),
+                        Text(
+                          'We are here to assist you.',
+                          style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600),
+                        ),
                       ],
                     ),
                   ),
-                  const Icon(Icons.headset_mic, color: Colors.white, size: 48),
+                  Icon(Icons.headset_mic_rounded, size: 48, color: Colors.white),
                 ],
               ),
             ),
+            
             const SizedBox(height: 32),
-            const Text('Contact Us', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const Text(
+              'Contact Us',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF1E293B)),
+            ),
             const SizedBox(height: 16),
-            _buildContactItem(Icons.email, 'Email', 'support@cleanatm.com'),
+            
+            _buildContactTile(
+              icon: Icons.email_rounded,
+              title: 'Email',
+              subtitle: 'support@cleanatm.com',
+              onTap: () {},
+            ),
             const SizedBox(height: 12),
-            _buildContactItem(Icons.phone, 'Phone', '+91 12345 67890'),
+            _buildContactTile(
+              icon: Icons.phone_rounded,
+              title: 'Phone',
+              subtitle: '+91 12345-67890',
+              onTap: () {},
+            ),
+            
             const SizedBox(height: 32),
-            _buildSectionItem('FAQ', 'View Frequently Asked Questions'),
-            _buildSectionItem('Submit Feedback', 'Help us improve the app'),
+            _buildActionLink('FAQ', 'View Frequently Asked Questions'),
+            _buildDivider(),
+            _buildActionLink('Submit Feedback', 'Help us improve the app'),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildContactItem(IconData icon, String title, String subtitle) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade200),
-      ),
-      child: ListTile(
-        leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: AppColors.primaryLight,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: AppColors.primary, size: 20),
+  Widget _buildContactTile({required IconData icon, required String title, required String subtitle, required VoidCallback onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF9FAFB),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFF3F4F6)),
         ),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-        subtitle: Text(subtitle, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-        trailing: const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.1), shape: BoxShape.circle),
+              child: Icon(icon, color: AppColors.primary, size: 20),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: Color(0xFF64748B))),
+                  const SizedBox(height: 2),
+                  Text(subtitle, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Color(0xFF334155))),
+                ],
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.grey.shade300),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildSectionItem(String title, String subtitle) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
-      subtitle: Text(subtitle, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-      trailing: const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+  Widget _buildActionLink(String title, String subtitle) {
+    return InkWell(
       onTap: () {},
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Color(0xFF1E293B))),
+                  const SizedBox(height: 4),
+                  Text(subtitle, style: TextStyle(fontSize: 12, color: Colors.grey.shade400, fontWeight: FontWeight.w600)),
+                ],
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.grey.shade300),
+          ],
+        ),
+      ),
     );
+  }
+
+  Widget _buildDivider() {
+    return Divider(color: Colors.grey.shade100, height: 1);
   }
 }

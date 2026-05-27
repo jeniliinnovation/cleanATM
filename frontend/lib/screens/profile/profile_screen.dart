@@ -1,6 +1,12 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../utils/app_colors.dart';
 import '../../services/api_service.dart';
+import 'edit_profile_screen.dart';
+import 'change_password_screen.dart';
+import 'about_us_screen.dart';
+import 'help_support_screen.dart';
+import 'notifications_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -53,86 +59,203 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: const Color(0xFFF9FFF9),
       appBar: AppBar(
-        title: const Text('Profile', style: TextStyle(fontWeight: FontWeight.bold)),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        title: const Text(
+          'Account Profile',
+          style: TextStyle(
+            color: Color(0xFF1E293B),
+            fontWeight: FontWeight.w900,
+            fontSize: 20,
+            letterSpacing: -0.5,
+          ),
         ),
       ),
       body: _isLoading 
-        ? const Center(child: CircularProgressIndicator())
-        : SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(
-                  child: Column(
-                    children: [
-                       const CircleAvatar(
-                        radius: 50,
-                        backgroundColor: AppColors.primaryLight,
-                        child: Icon(Icons.person, size: 60, color: AppColors.primary),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(_name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                      if (_phone.isNotEmpty) ...[
-                        const SizedBox(height: 4),
-                        Text(_phone, style: const TextStyle(color: AppColors.textSecondary)),
-                      ],
-                      if (_email.isNotEmpty) ...[
-                        const SizedBox(height: 4),
-                        Text(_email, style: const TextStyle(color: AppColors.textSecondary)),
-                      ],
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 32),
-                _buildProfileItem(Icons.person_outline, 'Edit Profile', onTap: () {}),
-                _buildProfileItem(Icons.lock_outline, 'Change Password', onTap: () {}),
-                _buildProfileItem(Icons.assignment_outlined, 'My Complaints', onTap: () {}),
-                _buildProfileItem(Icons.notifications_outlined, 'Notifications', onTap: () {}),
-                _buildProfileItem(Icons.info_outline, 'About Us', onTap: () {}),
-                const SizedBox(height: 24),
-                Container(
+        ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+        : Stack(
+            children: [
+              // Decorative background circles
+              Positioned(
+                top: 40,
+                right: -40,
+                child: Container(
+                  width: 200,
+                  height: 200,
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                      leading: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                           color: AppColors.error.withOpacity(0.12),
-                           shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.logout, color: AppColors.error, size: 24),
-                      ),
-                      title: const Text('Logout', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppColors.error)),
-                      trailing: const Icon(Icons.arrow_forward_ios, color: AppColors.textSecondary, size: 16),
-                      onTap: _logout,
-                    ),
+                    color: AppColors.primary.withOpacity(0.04),
+                    shape: BoxShape.circle,
                   ),
                 ),
-              ],
-            ),
+              ),
+              
+              SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Profile Header Card
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.7),
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(color: Colors.white.withOpacity(0.4)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.02),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(30),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: AppColors.primary.withOpacity(0.1), width: 4),
+                                ),
+                                child: const CircleAvatar(
+                                  radius: 45,
+                                  backgroundColor: Color(0xFFF1F5F9),
+                                  child: Icon(Icons.person_rounded, size: 50, color: AppColors.primary),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                _name,
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w900,
+                                  color: Color(0xFF1E293B),
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              if (_email.isNotEmpty)
+                                Text(
+                                  _email,
+                                  style: TextStyle(
+                                    color: Colors.grey.shade500,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              if (_phone.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 4),
+                                  child: Text(
+                                    _phone,
+                                    style: TextStyle(
+                                      color: Colors.grey.shade400,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 32),
+                    
+                    const Text(
+                      'Settings',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF64748B),
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    
+                    _buildPrimeProfileItem(
+                      Icons.person_outline_rounded,
+                      'Personal Information',
+                      'Edit your name and contact details',
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen())),
+                    ),
+                    _buildPrimeProfileItem(
+                      Icons.lock_outline_rounded,
+                      'Security & Password',
+                      'Change your login credentials',
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChangePasswordScreen())),
+                    ),
+                    _buildPrimeProfileItem(
+                      Icons.notifications_none_rounded,
+                      'Notification Preferences',
+                      'Manage how you receive alerts',
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsScreen())),
+                    ),
+                    _buildPrimeProfileItem(
+                      Icons.help_outline_rounded,
+                      'Support & Feedback',
+                      'Get help with your reports',
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HelpSupportScreen())),
+                    ),
+                    _buildPrimeProfileItem(
+                      Icons.info_outline_rounded,
+                      'About CleanATM',
+                      'App version and legal info',
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutUsScreen())),
+                    ),
+                    
+                    const SizedBox(height: 24),
+                    
+                    // Logout Button
+                    Container(
+                      height: 65,
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade50.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.red.shade100.withOpacity(0.5)),
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: _logout,
+                          borderRadius: BorderRadius.circular(20),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.logout_rounded, color: Colors.red.shade400, size: 22),
+                              const SizedBox(width: 12),
+                              Text(
+                                'Sign Out of Account',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 15,
+                                  color: Colors.red.shade400,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 100),
+                  ],
+                ),
+              ),
+            ],
           ),
     );
   }
 
-  Widget _buildProfileItem(IconData icon, String title, {VoidCallback? onTap}) {
+  Widget _buildPrimeProfileItem(IconData icon, String title, String subtitle, {VoidCallback? onTap}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -140,7 +263,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withOpacity(0.01),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -149,18 +272,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Material(
         color: Colors.transparent,
         child: ListTile(
+          onTap: onTap,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           leading: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.primaryLight.withOpacity(0.5),
-              shape: BoxShape.circle,
+              color: const Color(0xFFF1F5F9),
+              borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(icon, color: AppColors.primary, size: 24),
+            child: Icon(icon, color: const Color(0xFF64748B), size: 22),
           ),
-          title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppColors.textPrimary)),
-          trailing: const Icon(Icons.arrow_forward_ios, color: AppColors.textSecondary, size: 16),
-          onTap: onTap,
+          title: Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.w800,
+              fontSize: 15,
+              color: Color(0xFF1E293B),
+            ),
+          ),
+          subtitle: Text(
+            subtitle,
+            style: TextStyle(
+              color: Colors.grey.shade400,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          trailing: const Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFFCBD5E1), size: 14),
         ),
       ),
     );

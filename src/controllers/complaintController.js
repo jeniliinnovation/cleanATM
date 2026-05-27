@@ -9,9 +9,11 @@ exports.submitComplaint = async (req, res) => {
   try {
     const { atm_id, description, complaint_type } = req.body;
     let photo_url = null;
+    let photo_urls = [];
     
-    if (req.file) {
-      photo_url = req.file.path.replace(/\\/g, '/');
+    if (req.files && req.files.length > 0) {
+      photo_urls = req.files.map(file => file.path.replace(/\\/g, '/'));
+      photo_url = photo_urls[0];
     }
 
     const complaint = await Complaint.create({
@@ -19,7 +21,8 @@ exports.submitComplaint = async (req, res) => {
       atm_id,
       description,
       complaint_type,
-      photo_url
+      photo_url,
+      photo_urls
     });
 
     // Notify relevant Bank Managers
@@ -106,13 +109,33 @@ exports.updateComplaint = async (req, res) => {
     });
     if (!complaint) return res.status(404).json({ success: false, message: 'Complaint not found' });
 
+    // Enforce 2-hour edit window
+    const createdAt = new Date(complaint.createdAt);
+    const now = new Date();
+    const hoursElapsed = (now - createdAt) / (1000 * 60 * 60);
+
+    if (hoursElapsed > 2) {
+      return res.status(403).json({ success: false, message: 'Edit window (2 hours) has expired' });
+    }
+
+    if (complaint.status !== 'pending') {
+      return res.status(403).json({ success: false, message: 'Only pending complaints can be edited' });
+    }
+
     if (description) complaint.description = description;
 
-    if (req.file) {
-      if (complaint.photo_url && fs.existsSync(complaint.photo_url)) {
+    if (req.files && req.files.length > 0) {
+      // Clear old photos
+      if (complaint.photo_urls && Array.isArray(complaint.photo_urls)) {
+        complaint.photo_urls.forEach(p => {
+          if (fs.existsSync(p)) fs.unlinkSync(p);
+        });
+      } else if (complaint.photo_url && fs.existsSync(complaint.photo_url)) {
         fs.unlinkSync(complaint.photo_url);
       }
-      complaint.photo_url = req.file.path.replace(/\\/g, '/');
+      
+      complaint.photo_urls = req.files.map(file => file.path.replace(/\\/g, '/'));
+      complaint.photo_url = complaint.photo_urls[0];
     }
 
     await complaint.save();

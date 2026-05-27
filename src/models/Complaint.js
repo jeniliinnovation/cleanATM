@@ -19,11 +19,14 @@ const Complaint = sequelize.define('Complaint', {
     type: DataTypes.TEXT,
   },
   complaint_type: {
-    type: DataTypes.ENUM('dirty', 'ac_issue', 'garbage', 'damage', 'no_power', 'other'),
+    type: DataTypes.ENUM('dirty', 'ac_issue', 'garbage', 'damage', 'no_power', 'other', 'atm_dirty', 'no_cash', 'machine_error', 'vandalism'),
     allowNull: false,
   },
   photo_url: {
     type: DataTypes.STRING,
+  },
+  photo_urls: {
+    type: DataTypes.JSON,
   },
   status: {
     type: DataTypes.ENUM('pending', 'in_progress', 'resolved', 'rejected'),

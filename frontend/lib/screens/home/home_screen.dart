@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../../utils/app_colors.dart';
 import '../../services/api_service.dart';
 import '../profile/notifications_screen.dart';
 
@@ -49,59 +48,52 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: const Color(0xFFF9FFF9),
       body: Stack(
         children: [
-          // Background Decorative Elements
+          // Background Decorative Blur
           Positioned(
-            top: -100,
-            right: -50,
+            top: -50,
+            right: -30,
             child: Container(
-              width: 300,
-              height: 300,
+              width: 200,
+              height: 200,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.08),
+                color: const Color(0xFF10B981).withOpacity(0.05),
                 shape: BoxShape.circle,
               ),
-            ),
-          ),
-          Positioned(
-            bottom: 100,
-            left: -80,
-            child: Container(
-              width: 250,
-              height: 250,
-              decoration: BoxDecoration(
-                color: AppColors.accentBlue.withOpacity(0.05),
-                shape: BoxShape.circle,
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+                child: Container(color: Colors.transparent),
               ),
             ),
           ),
           
           SafeArea(
             child: _isLoading 
-              ? const Center(child: CircularProgressIndicator())
+              ? const Center(child: CircularProgressIndicator(color: Color(0xFF10B981)))
               : RefreshIndicator(
                   onRefresh: _loadData,
-                  color: AppColors.primary,
+                  color: const Color(0xFF10B981),
                   child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Header
+                        // Prime Header
                         Row(
                           children: [
                             Container(
+                              padding: const EdgeInsets.all(3),
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                border: Border.all(color: AppColors.primary.withOpacity(0.2), width: 2),
+                                gradient: const LinearGradient(colors: [Color(0xFF10B981), Color(0xFF34D399)]),
                               ),
                               child: const CircleAvatar(
-                                radius: 24,
-                                backgroundColor: AppColors.primaryLight,
-                                child: Icon(Icons.person_rounded, color: AppColors.primary, size: 28),
+                                radius: 26,
+                                backgroundColor: Colors.white,
+                                child: Icon(Icons.person_rounded, color: Color(0xFF10B981), size: 30),
                               ),
                             ),
                             const SizedBox(width: 16),
@@ -110,140 +102,82 @@ class _HomeScreenState extends State<HomeScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Welcome back,',
-                                    style: TextStyle(
-                                      color: AppColors.textSecondary,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                    'Welcome back, 👋',
+                                    style: TextStyle(color: Colors.grey.shade500, fontSize: 13, fontWeight: FontWeight.w700),
                                   ),
                                   Text(
                                     _userName,
                                     style: const TextStyle(
                                       fontSize: 22,
-                                      fontWeight: FontWeight.w800,
-                                      color: AppColors.textPrimary,
-                                      letterSpacing: -0.5,
+                                      fontWeight: FontWeight.w900,
+                                      color: Color(0xFF1E293B),
+                                      letterSpacing: -0.8,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.05),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: IconButton(
-                                icon: const Icon(Icons.notifications_none_rounded, color: AppColors.textPrimary),
-                                onPressed: () {
-                                   Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsScreen()));
-                                },
-                              ),
-                            ),
+                            _buildIconBadge(Icons.notifications_none_rounded, () {
+                              Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsScreen()));
+                            }),
                           ],
                         ),
-                        const SizedBox(height: 32),
                         
-                        // Featured Banner
-                        _buildFeaturedBanner(),
+                        const SizedBox(height: 35),
                         
-                        const SizedBox(height: 32),
+                        // Status Card
+                        _buildStatusCard(),
+                        
+                        const SizedBox(height: 35),
                         const Text(
                           'Quick Actions',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.textPrimary,
-                            letterSpacing: -0.5,
-                          ),
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF1E293B), letterSpacing: -0.5),
                         ),
                         const SizedBox(height: 20),
                         
-                        // Quick Actions Grid
+                        // Grid Actions
                         Row(
                           children: [
-                            _buildActionCard(
+                            _buildActionTile(
                               Icons.add_task_rounded,
                               'File Report',
-                              'Report ATM issues',
-                              AppColors.primary,
-                              () => widget.onNavigateToTab?.call(2),
+                              'Fast reporting',
+                              const Color(0xFF10B981),
+                              () => widget.onNavigateToTab?.call(1), // Go to ATM list or report
                             ),
                             const SizedBox(width: 16),
-                            _buildActionCard(
-                              Icons.history_rounded,
-                              'Activity',
-                              'Check status',
-                              AppColors.accentBlue,
-                              () => widget.onNavigateToTab?.call(2),
+                            _buildActionTile(
+                              Icons.location_on_rounded,
+                              'Nearby ATMs',
+                              'Locate easily',
+                              const Color(0xFF3B82F6),
+                              () => widget.onNavigateToTab?.call(1),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 16),
-                        _buildWideActionCard(
-                          Icons.map_rounded,
-                          'Nearby ATMs',
-                          'Find the nearest functional ATM',
-                          AppColors.accentPurple,
-                          () => widget.onNavigateToTab?.call(1),
-                        ),
                         
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 35),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text(
-                              'Recent History',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.textPrimary,
-                                letterSpacing: -0.5,
-                              ),
+                              'Reporting History',
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF1E293B), letterSpacing: -0.5),
                             ),
                             TextButton(
                               onPressed: () => widget.onNavigateToTab?.call(2),
-                              child: const Text(
-                                'View All',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.primary,
-                                ),
-                              ),
+                              child: const Text('View All', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF10B981))),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 15),
                         
-                        // Modern Complaint List
+                        // History List
                         ..._recentComplaints.isNotEmpty 
-                            ? _recentComplaints.map((c) => _buildModernComplaintCard(c)).toList()
-                            : [
-                                Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 40),
-                                    child: Column(
-                                      children: [
-                                        Icon(Icons.assignment_late_outlined, size: 48, color: AppColors.textSecondary.withOpacity(0.3)),
-                                        const SizedBox(height: 12),
-                                        Text(
-                                          "No recent reports",
-                                          style: TextStyle(color: AppColors.textSecondary.withOpacity(0.5), fontWeight: FontWeight.w500),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                )
-                              ],
-                        const SizedBox(height: 100), // Space for fab/nav bar
+                            ? _recentComplaints.map((c) => _buildHistoryCard(c)).toList()
+                            : [_buildEmptyHistory()],
+                            
+                        const SizedBox(height: 120),
                       ],
                     ),
                   ),
@@ -254,69 +188,65 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildFeaturedBanner() {
+  Widget _buildIconBadge(IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 15, offset: const Offset(0, 5))],
+        ),
+        child: Icon(icon, color: const Color(0xFF1E293B), size: 22),
+      ),
+    );
+  }
+
+  Widget _buildStatusCard() {
     return Container(
       width: double.infinity,
       height: 180,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(32),
-        gradient: LinearGradient(
-          colors: [
-            AppColors.primary,
-            AppColors.primary.withBlue(100),
-          ],
+        gradient: const LinearGradient(
+          colors: [Color(0xFF10B981), Color(0xFF059669)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
-            blurRadius: 25,
-            offset: const Offset(0, 12),
-          ),
+          BoxShadow(color: const Color(0xFF10B981).withOpacity(0.25), blurRadius: 25, offset: const Offset(0, 12)),
         ],
       ),
       child: Stack(
         children: [
           Positioned(
-            right: -20,
-            bottom: -20,
-            child: Icon(Icons.atm_rounded, size: 180, color: Colors.white.withOpacity(0.12)),
+            right: -30,
+            bottom: -30,
+            child: Icon(Icons.clean_hands_rounded, size: 200, color: Colors.white.withOpacity(0.1)),
           ),
           Padding(
-            padding: const EdgeInsets.all(28.0),
+            padding: const EdgeInsets.all(28),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(100),
                   ),
-                  child: const Text(
-                    'Service Status: Online',
-                    style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-                  ),
+                  child: const Text('STATUS: ACTIVE SERV', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.2)),
                 ),
                 const Spacer(),
                 const Text(
-                  'Keep your city\nClean & Functional',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w900,
-                    height: 1.1,
-                  ),
+                  'Make your city\nCleaner today.',
+                  style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900, height: 1.1),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 8),
                 Text(
-                  'Reporting issues makes a difference.',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  'Join 5,000+ citizens in our mission.',
+                  style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
@@ -326,46 +256,29 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildActionCard(IconData icon, String title, String subtitle, Color color, VoidCallback onTap) {
+  Widget _buildActionTile(IconData icon, String title, String desc, Color color, VoidCallback onTap) {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
-              ),
-            ],
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 20, offset: const Offset(0, 10))],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(16),
-                ),
+                decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(16)),
                 child: Icon(icon, color: color, size: 28),
               ),
-              const SizedBox(height: 16),
-              Text(
-                title,
-                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppColors.textPrimary),
-              ),
+              const SizedBox(height: 20),
+              Text(title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Color(0xFF1E293B))),
               const SizedBox(height: 4),
-              Text(
-                subtitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w500),
-              ),
+              Text(desc, style: TextStyle(color: Colors.grey.shade400, fontSize: 12, fontWeight: FontWeight.w700)),
             ],
           ),
         ),
@@ -373,150 +286,80 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildWideActionCard(IconData icon, String title, String subtitle, Color color, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Icon(icon, color: color, size: 32),
-            ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: AppColors.textPrimary),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w500),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppColors.textSecondary),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildModernComplaintCard(Map<String, dynamic> c) {
-    final atmData = c['ATM'] ?? {};
-    final bName = atmData['bank_name'] ?? c['bank_name']?.toString() ?? 'Unknown Bank';
+  Widget _buildHistoryCard(Map<String, dynamic> c) {
     final status = c['status']?.toString() ?? 'Pending';
-    final statusColor = _getStatusColor(status);
+    final cardColor = _getStatusColor(status);
     
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.6),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.4)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 15, offset: const Offset(0, 5))],
+        border: Border.all(color: Colors.grey.shade50),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: cardColor.withOpacity(0.08), borderRadius: BorderRadius.circular(18)),
+            child: Icon(_getStatusIcon(status), color: cardColor, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Icon(
-                    _getStatusIcon(status),
-                    color: statusColor,
-                    size: 26,
-                  ),
+                Text(
+                  c['bank_name'] ?? 'ATM Terminal',
+                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: Color(0xFF1E293B)),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        bName,
-                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppColors.textPrimary),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'ID: ${c['complaint_id']}',
-                        style: TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w500),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: Text(
-                    status.replaceFirst('_', ' ').toUpperCase(),
-                    style: TextStyle(
-                      color: statusColor,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0.8,
-                    ),
-                  ),
+                Text(
+                  'Ticket #${c['complaint_id']}',
+                  style: TextStyle(color: Colors.grey.shade400, fontSize: 12, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
           ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(color: cardColor.withOpacity(0.08), borderRadius: BorderRadius.circular(100)),
+            child: Text(
+              status.toUpperCase(),
+              style: TextStyle(color: cardColor, fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 0.5),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyHistory() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 40),
+        child: Column(
+          children: [
+            Icon(Icons.history_toggle_off_rounded, size: 60, color: Colors.grey.shade100),
+            const SizedBox(height: 16),
+            Text('No history found', style: TextStyle(color: Colors.grey.shade300, fontWeight: FontWeight.w800)),
+          ],
         ),
       ),
     );
   }
 
   IconData _getStatusIcon(String status) {
-    final lower = status.toLowerCase();
-    if (lower == 'resolved') return Icons.check_circle_rounded;
-    if (lower == 'in_progress') return Icons.pending_rounded;
-    return Icons.report_gmailerrorred_rounded;
+    if (status.toLowerCase().contains('resolved')) return Icons.check_circle_rounded;
+    if (status.toLowerCase().contains('progress')) return Icons.pending_rounded;
+    return Icons.error_rounded;
   }
 
   Color _getStatusColor(String status) {
-    final lower = status.toLowerCase();
-    if (lower == 'resolved') return AppColors.success;
-    if (lower == 'in_progress') return AppColors.warning;
-    return Colors.deepOrangeAccent;
+    if (status.toLowerCase().contains('resolved')) return const Color(0xFF10B981);
+    if (status.toLowerCase().contains('progress')) return const Color(0xFFF59E0B);
+    return const Color(0xFFEF4444);
   }
 }
 

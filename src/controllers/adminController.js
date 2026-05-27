@@ -140,11 +140,13 @@ exports.updateComplaintStatus = async (req, res) => {
       }
     }
 
+    console.log(`Updating complaint ${req.params.complaint_id} to status: ${status}`);
     complaint.status = status;
     if (remarks) complaint.remarks = remarks;
     if (resolved_at) complaint.resolved_at = resolved_at;
 
     await complaint.save();
+    console.log('Complaint saved successfully');
 
     // Notify the user who reported this
     try {
@@ -187,6 +189,7 @@ exports.getStats = async (req, res) => {
     const resolved = await Complaint.count({ where: { status: 'resolved' }, include });
     const pending = await Complaint.count({ where: { status: 'pending' }, include });
     const in_progress = await Complaint.count({ where: { status: 'in_progress' }, include });
+    const rejected = await Complaint.count({ where: { status: 'rejected' }, include });
     
     res.json({
       success: true,
@@ -194,7 +197,8 @@ exports.getStats = async (req, res) => {
         total,
         resolved,
         pending,
-        in_progress
+        in_progress,
+        rejected
       }
     });
   } catch (error) {

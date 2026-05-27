@@ -156,9 +156,9 @@ export default function ComplaintsPage() {
 
   return (
     <>
-      <TopHeader 
-        title={user?.bank_code && user.bank_code !== 'DEFAULT' ? `${user.bank_code} Complaints` : "Complaints"} 
-        subtitle={user?.bank_code && user.bank_code !== 'DEFAULT' ? `Manage complaints for ${user.bank_code} ATMs` : "Manage and resolve ATM complaints"} 
+      <TopHeader
+        title={user?.bank_code && user.bank_code !== 'DEFAULT' ? `${user.bank_code} Complaints` : "Complaints"}
+        subtitle={user?.bank_code && user.bank_code !== 'DEFAULT' ? `Manage complaints for ${user.bank_code} ATMs` : "Manage and resolve ATM complaints"}
       />
 
       <div className="page-content">
@@ -186,8 +186,8 @@ export default function ComplaintsPage() {
           {user?.bank_code && user.bank_code !== 'DEFAULT' && branches.length > 0 && (
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
               <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>Branch:</span>
-              <select 
-                className="form-select" 
+              <select
+                className="form-select"
                 style={{ width: 'auto', minWidth: 150, height: 36, padding: '0 12px' }}
                 value={branchFilter}
                 onChange={(e) => setBranchFilter(e.target.value)}

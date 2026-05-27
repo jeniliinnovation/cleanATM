@@ -90,7 +90,7 @@ export default function DashboardPage() {
     { name: 'Pending', value: stats.pending },
     { name: 'In Progress', value: stats.in_progress },
     { name: 'Resolved', value: stats.resolved },
-    { name: 'Rejected', value: Math.max(0, stats.total - stats.pending - stats.in_progress - stats.resolved) },
+    { name: 'Rejected', value: stats.rejected },
   ].filter((d) => d.value > 0);
 
   // Synthetic bar data for demo
@@ -269,6 +269,20 @@ export default function DashboardPage() {
             </div>
             <h3>{stats.resolved}</h3>
             <p>Resolved</p>
+          </div>
+
+          <div className="stat-card red">
+            <div className="stat-card-top">
+              <div className="stat-card-icon red">
+                <FileWarning />
+              </div>
+              <div className="stat-card-trend none">
+                <TrendingUp size={14} />
+                <span>0%</span>
+              </div>
+            </div>
+            <h3>{stats.rejected}</h3>
+            <p>Rejected</p>
           </div>
         </div>
 

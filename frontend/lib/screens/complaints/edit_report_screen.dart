@@ -6,25 +6,19 @@ import '../../utils/app_colors.dart';
 import '../../services/api_service.dart';
 import 'custom_camera_screen.dart';
 
-class FileReportScreen extends StatefulWidget {
-  final String? initialAtmId;
-  const FileReportScreen({super.key, this.initialAtmId});
+class EditReportScreen extends StatefulWidget {
+  final Map<String, dynamic> complaint;
+  const EditReportScreen({super.key, required this.complaint});
 
   @override
-  State<FileReportScreen> createState() => _FileReportScreenState();
+  State<EditReportScreen> createState() => _EditReportScreenState();
 }
 
-class _FileReportScreenState extends State<FileReportScreen> {
+class _EditReportScreenState extends State<EditReportScreen> {
   final _descController = TextEditingController();
-  String _complaintType = 'atm_dirty';
   bool _isLoading = false;
-  bool _isFetchingAtms = true;
   
-  // ATM Data
-  List<dynamic> _atms = [];
-  String? _selectedAtmId;
-
-  // Multiple image storage
+  // Multiple image storage (newly picked)
   final List<XFile> _pickedFiles = [];
   final List<Uint8List> _imagesBytes = [];
   final ImagePicker _picker = ImagePicker();
@@ -32,33 +26,7 @@ class _FileReportScreenState extends State<FileReportScreen> {
   @override
   void initState() {
     super.initState();
-    _selectedAtmId = widget.initialAtmId;
-    _fetchAtms();
-  }
-
-  Future<void> _fetchAtms() async {
-    try {
-      final res = await ApiService.listAtms();
-      if (res['success'] == true) {
-        setState(() {
-          final rawAtms = res['data']?['atms'] ?? [];
-          // Filter out ATMs with 'Closed' or 'Maintenance' status
-          _atms = rawAtms.where((atm) {
-            final status = atm['status']?.toString().toLowerCase();
-            return status != 'closed' && status != 'maintenance';
-          }).toList();
-          
-          if (_selectedAtmId != null) {
-             final exists = _atms.any((a) => a['atm_id'].toString() == _selectedAtmId);
-             if (!exists) _selectedAtmId = null; 
-          }
-        });
-      }
-    } catch (e) {
-      debugPrint('Error fetching atms: $e');
-    } finally {
-      if (mounted) setState(() => _isFetchingAtms = false);
-    }
+    _descController.text = widget.complaint['description'] ?? '';
   }
 
   @override
@@ -67,11 +35,11 @@ class _FileReportScreenState extends State<FileReportScreen> {
     super.dispose();
   }
 
-  Future<void> _submitReport() async {
-    if (_selectedAtmId == null || _descController.text.trim().isEmpty) {
+  Future<void> _updateReport() async {
+    if (_descController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Please select an ATM and fill description'),
+          content: const Text('Please fill description'),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppColors.error,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -83,29 +51,28 @@ class _FileReportScreenState extends State<FileReportScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final res = await ApiService.submitComplaint(
-        atmId: _selectedAtmId!,
-        complaintType: _complaintType,
+      final res = await ApiService.updateComplaint(
+        complaintId: widget.complaint['complaint_id'].toString(),
         description: _descController.text.trim(),
-        imagesBytes: _imagesBytes,
-        imagesNames: _pickedFiles.map((f) => f.name).toList(),
+        imagesBytes: _imagesBytes.isNotEmpty ? _imagesBytes : null,
+        imagesNames: _pickedFiles.isNotEmpty ? _pickedFiles.map((f) => f.name).toList() : null,
       );
 
       if (mounted) {
         if (res['success'] == true) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Report submitted successfully!'),
+              content: const Text('Report updated successfully!'),
               behavior: SnackBarBehavior.floating,
               backgroundColor: AppColors.success,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
           );
-          Navigator.pop(context);
+          Navigator.pop(context, true); // Return true to indicate update happened
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(res['message'] ?? 'Failed to submit report'),
+              content: Text(res['message'] ?? 'Failed to update report'),
               behavior: SnackBarBehavior.floating,
               backgroundColor: AppColors.error,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -144,7 +111,9 @@ class _FileReportScreenState extends State<FileReportScreen> {
           children: [
             Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(10))),
             const SizedBox(height: 25),
-            const Text('Upload Evidence', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF1E293B))),
+            const Text('Update Evidence Photos', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF1E293B))),
+            const SizedBox(height: 12),
+            const Text('Adding new photos will replace existing ones.', style: TextStyle(fontSize: 12, color: Colors.orange, fontWeight: FontWeight.bold)),
             const SizedBox(height: 25),
             Row(
               children: [
@@ -154,7 +123,6 @@ class _FileReportScreenState extends State<FileReportScreen> {
                     label: 'Camera',
                     onTap: () async {
                       Navigator.pop(context);
-                      // Use Custom Camera Screen (CameraX)
                       final XFile? photo = await Navigator.push(
                         context,
                         MaterialPageRoute(builder: (_) => const CustomCameraScreen()),
@@ -232,6 +200,9 @@ class _FileReportScreenState extends State<FileReportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final atm = widget.complaint['ATM'] ?? {};
+    final title = atm['bank_name'] ?? 'ATM Report';
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Stack(
@@ -241,24 +212,8 @@ class _FileReportScreenState extends State<FileReportScreen> {
             top: -50,
             left: -50,
             child: Container(
-              width: 200,
-              height: 200,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.05),
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 200,
-            right: -80,
-            child: Container(
-              width: 300,
-              height: 300,
-              decoration: BoxDecoration(
-                color: AppColors.accentBlue.withOpacity(0.04),
-                shape: BoxShape.circle,
-              ),
+              width: 200, height: 200,
+              decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.05), shape: BoxShape.circle),
             ),
           ),
           
@@ -266,22 +221,15 @@ class _FileReportScreenState extends State<FileReportScreen> {
             slivers: [
               SliverAppBar(
                 expandedHeight: 120,
-                floating: false,
                 pinned: true,
                 elevation: 0,
                 backgroundColor: AppColors.background.withOpacity(0.8),
                 flexibleSpace: FlexibleSpaceBar(
                   title: const Text(
-                    'File a Report',
-                    style: TextStyle(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 20,
-                      letterSpacing: -0.5,
-                    ),
+                    'Edit Report',
+                    style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800, fontSize: 20),
                   ),
                   centerTitle: true,
-                  background: Container(color: Colors.transparent),
                 ),
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20),
@@ -292,27 +240,40 @@ class _FileReportScreenState extends State<FileReportScreen> {
                 padding: const EdgeInsets.all(24.0),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
-                    _buildSectionHeader('ATM Terminal Selection'),
+                    _buildSectionHeader('Report Information'),
                     const SizedBox(height: 12),
-                    _buildAtmDropdown(),
+                    Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('ATM: $title', style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF334155))),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Type: ${(widget.complaint['complaint_type'] ?? '').toString().replaceAll('_', ' ').toUpperCase()}',
+                            style: TextStyle(fontSize: 12, color: Colors.grey.shade500, fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                    ),
                     
                     const SizedBox(height: 28),
-                    _buildSectionHeader('Complaint Type'),
-                    const SizedBox(height: 12),
-                    _buildGlassDropdown(),
-                    
-                    const SizedBox(height: 28),
-                    _buildSectionHeader('Description'),
+                    _buildSectionHeader('Update Description'),
                     const SizedBox(height: 12),
                     _buildGlassInput(
                       controller: _descController,
-                      hint: 'Tell us what happened...',
+                      hint: 'Update your description...',
                       icon: Icons.description_outlined,
                       maxLines: 4,
                     ),
                     
                     const SizedBox(height: 28),
-                    _buildSectionHeader('Evidence (Up to 5 images)'),
+                    _buildSectionHeader('Replace Evidence (Optional)'),
                     const SizedBox(height: 12),
                     _buildPhotoUploadSection(),
                     
@@ -332,65 +293,11 @@ class _FileReportScreenState extends State<FileReportScreen> {
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
-      style: const TextStyle(
-        fontWeight: FontWeight.w800,
-        fontSize: 15,
-        color: AppColors.textPrimary,
-        letterSpacing: 0.2,
-      ),
+      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: AppColors.textPrimary),
     );
   }
 
-  Widget _buildAtmDropdown() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.6),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.4)),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-            child: _isFetchingAtms 
-              ? const SizedBox(height: 50, child: Center(child: LinearProgressIndicator()))
-              : DropdownButtonHideUnderline(
-                  child: DropdownButtonFormField<String>(
-                    value: _selectedAtmId,
-                    hint: const Text('Select ATM Terminal', style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
-                    style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Poppins'),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      prefixIcon: Icon(Icons.atm_rounded, color: AppColors.primary, size: 24),
-                    ),
-                    icon: const Icon(Icons.expand_more_rounded, color: AppColors.textSecondary),
-                    items: _atms.map((atm) {
-                      return DropdownMenuItem<String>(
-                        value: atm['atm_id'].toString(),
-                        child: Text('${atm['atm_id']} - ${atm['bank_name']}', overflow: TextOverflow.ellipsis),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() => _selectedAtmId = value);
-                    },
-                  ),
-                ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGlassInput({
-    required TextEditingController controller,
-    required String hint,
-    required IconData icon,
-    int maxLines = 1,
-  }) {
+  Widget _buildGlassInput({required TextEditingController controller, required String hint, required IconData icon, int maxLines = 1}) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.6),
@@ -409,49 +316,7 @@ class _FileReportScreenState extends State<FileReportScreen> {
               hintText: hint,
               prefixIcon: Icon(icon, color: AppColors.primary.withOpacity(0.6), size: 22),
               border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGlassDropdown() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.6),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.4)),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButtonFormField<String>(
-                value: _complaintType,
-                style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Poppins'),
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                ),
-                icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textSecondary),
-                items: const [
-                  DropdownMenuItem(value: 'atm_dirty', child: Text('ATM is dirty/unhygienic')),
-                  DropdownMenuItem(value: 'no_cash', child: Text('No cash available')),
-                  DropdownMenuItem(value: 'machine_error', child: Text('Machine not working')),
-                  DropdownMenuItem(value: 'vandalism', child: Text('Physical damage/Vandalism')),
-                ],
-                onChanged: (value) {
-                  if (value != null) setState(() => _complaintType = value);
-                },
-              ),
             ),
           ),
         ),
@@ -504,42 +369,27 @@ class _FileReportScreenState extends State<FileReportScreen> {
             ),
           ),
         
-        if (_imagesBytes.length < 5)
-          InkWell(
-            onTap: _showImageSourceOptions,
-            borderRadius: BorderRadius.circular(24),
-            child: Container(
-              height: _imagesBytes.isEmpty ? 160 : 60,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.03),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: AppColors.primary.withOpacity(0.1), width: 1.5),
-              ),
-              child: _imagesBytes.isEmpty 
-                ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.1), shape: BoxShape.circle),
-                        child: const Icon(Icons.add_a_photo_rounded, color: AppColors.primary, size: 30),
-                      ),
-                      const SizedBox(height: 12),
-                      const Text('Add Evidence Photos', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700, fontSize: 14)),
-                      Text('Up to 5 images for better proof', style: TextStyle(color: AppColors.textSecondary.withOpacity(0.7), fontWeight: FontWeight.w500, fontSize: 12)),
-                    ],
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.add_circle_outline_rounded, color: AppColors.primary, size: 20),
-                      const SizedBox(width: 10),
-                      const Text('Add More Photos', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800, fontSize: 14)),
-                    ],
-                  ),
+        InkWell(
+          onTap: _showImageSourceOptions,
+          borderRadius: BorderRadius.circular(24),
+          child: Container(
+            height: 60,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.03),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: AppColors.primary.withOpacity(0.1), width: 1.5),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(_imagesBytes.isEmpty ? Icons.add_a_photo_rounded : Icons.add_circle_outline_rounded, color: AppColors.primary, size: 20),
+                const SizedBox(width: 10),
+                Text(_imagesBytes.isEmpty ? 'Change Evidence Photos' : 'Add More Photos', style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800, fontSize: 14)),
+              ],
             ),
           ),
+        ),
       ],
     );
   }
@@ -550,19 +400,11 @@ class _FileReportScreenState extends State<FileReportScreen> {
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        gradient: const LinearGradient(
-          colors: [AppColors.primary, Color(0xFF22C55E)],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        gradient: const LinearGradient(colors: [AppColors.primary, Color(0xFF22C55E)]),
+        boxShadow: [BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10))],
       ),
       child: ElevatedButton(
-        onPressed: _isLoading ? null : _submitReport,
+        onPressed: _isLoading ? null : _updateReport,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
@@ -570,12 +412,8 @@ class _FileReportScreenState extends State<FileReportScreen> {
         ),
         child: _isLoading 
             ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3)) 
-            : const Text(
-                'Submit Report',
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: 0.5),
-              ),
+            : const Text('Update Report', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Colors.white)),
       ),
     );
   }
 }
-

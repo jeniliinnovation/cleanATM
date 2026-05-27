@@ -35,7 +35,6 @@ class ApiService {
         body: jsonEncode({'email': email, 'password': password}),
       );
       final data = jsonDecode(res.body);
-      // Token is nested: { success: true, data: { token: '...' } }
       final token = data['token'] ?? data['data']?['token'];
       if (data['success'] == true && token != null) {
         await setToken(token);
@@ -64,7 +63,6 @@ class ApiService {
         }),
       );
       final data = jsonDecode(res.body);
-      // Token is nested: { success: true, data: { token: '...' } }
       final token = data['token'] ?? data['data']?['token'];
       if (data['success'] == true && token != null) {
         await setToken(token);
@@ -144,7 +142,11 @@ class ApiService {
         Uri.parse('$baseUrl/atms'),
         headers: {'Authorization': 'Bearer $token'},
       );
-      return jsonDecode(res.body);
+      final decoded = jsonDecode(res.body);
+      if (decoded is List) {
+        return {'success': true, 'data': {'atms': decoded}};
+      }
+      return decoded;
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
@@ -157,7 +159,11 @@ class ApiService {
         Uri.parse('$baseUrl/complaints'),
         headers: {'Authorization': 'Bearer $token'},
       );
-      return jsonDecode(res.body);
+      final decoded = jsonDecode(res.body);
+      if (decoded is List) {
+        return {'success': true, 'data': decoded};
+      }
+      return decoded;
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
@@ -167,8 +173,8 @@ class ApiService {
     required String atmId,
     required String complaintType,
     required String description,
-    Uint8List? imageBytes,
-    String? imageName,
+    List<Uint8List>? imagesBytes,
+    List<String>? imagesNames,
   }) async {
     try {
       final token = await _getToken();
@@ -178,12 +184,14 @@ class ApiService {
       request.fields['complaint_type'] = complaintType;
       request.fields['description'] = description;
 
-      if (imageBytes != null) {
-        request.files.add(http.MultipartFile.fromBytes(
-          'photo',
-          imageBytes,
-          filename: imageName ?? 'complaint.jpg',
-        ));
+      if (imagesBytes != null && imagesNames != null) {
+        for (int i = 0; i < imagesBytes.length; i++) {
+          request.files.add(http.MultipartFile.fromBytes(
+            'photo',
+            imagesBytes[i],
+            filename: imagesNames[i],
+          ));
+        }
       }
 
       var streamedResponse = await request.send();
@@ -197,8 +205,8 @@ class ApiService {
   static Future<Map<String, dynamic>> updateComplaint({
     required String complaintId,
     String? description,
-    Uint8List? imageBytes,
-    String? imageName,
+    List<Uint8List>? imagesBytes,
+    List<String>? imagesNames,
   }) async {
     try {
       final token = await _getToken();
@@ -209,12 +217,14 @@ class ApiService {
         request.fields['description'] = description;
       }
 
-      if (imageBytes != null) {
-        request.files.add(http.MultipartFile.fromBytes(
-          'photo',
-          imageBytes,
-          filename: imageName ?? 'update.jpg',
-        ));
+      if (imagesBytes != null && imagesNames != null) {
+        for (int i = 0; i < imagesBytes.length; i++) {
+          request.files.add(http.MultipartFile.fromBytes(
+            'photo',
+            imagesBytes[i],
+            filename: imagesNames[i],
+          ));
+        }
       }
 
       var streamedResponse = await request.send();
@@ -306,7 +316,11 @@ class ApiService {
         Uri.parse('$baseUrl/notifications'),
         headers: {'Authorization': 'Bearer $token'},
       );
-      return jsonDecode(res.body);
+      final decoded = jsonDecode(res.body);
+      if (decoded is List) {
+        return {'success': true, 'data': decoded};
+      }
+      return decoded;
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
@@ -314,8 +328,6 @@ class ApiService {
 
   static String getBankLogo(String name) {
     name = name.toLowerCase();
-    
-    // Local assets
     if (name.contains('axis')) return 'logos/axis_logo.png';
     if (name.contains('icici')) return 'logos/icici_logo.png';
     if (name.contains('hdfc')) return 'logos/hdfc_logo.png';
@@ -323,7 +335,6 @@ class ApiService {
     if (name.contains('baroda')) return 'logos/bob_logo.png';
     if (name.contains('sbi') || name.contains('state bank')) return 'logos/sbi_logo.png';
     
-    // Network fallbacks for other banks
     if (name.contains('hdfc')) return 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/HDFC_Bank_Logo.svg/512px-HDFC_Bank_Logo.svg.png';
     if (name.contains('icici')) return 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/ICICI_Bank_Logo.svg/512px-ICICI_Bank_Logo.svg.png';
     if (name.contains('canara')) return 'https://upload.wikimedia.org/wikipedia/en/thumb/6/69/Canara_Bank_Logo.svg/512px-Canara_Bank_Logo.svg.png';

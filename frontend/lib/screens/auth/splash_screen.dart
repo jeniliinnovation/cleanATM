@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../utils/app_colors.dart';
 import '../../services/api_service.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -13,8 +12,6 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
 
   late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
@@ -23,26 +20,6 @@ class _SplashScreenState extends State<SplashScreen>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
-    );
-
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeOutBack,
-      ),
-    );
-
-    _fadeAnimation = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeIn,
-      ),
     );
 
     _controller.forward();
@@ -73,104 +50,103 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5FFF7),
+      backgroundColor: const Color(0xFFF9FFF9), // Clean fresh green tint
       body: Stack(
         children: [
-
-
-
-          /// Main Content
-          Center(
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: ScaleTransition(
-                scale: _scaleAnimation,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-
-                    /// Logo Container
-                    Container(
-                      height: 180,
-                      width: 180,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.green.withOpacity(0.15),
-                            blurRadius: 30,
-                            spreadRadius: 5,
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(25),
-                        child: Image.asset(
-                          'assets/logos/logo.png',
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 30),
-
-                    /// App Name
-                    RichText(
-                      text: const TextSpan(
-                        children: [
-                          TextSpan(
-                            text: 'Clean',
-                            style: TextStyle(
-                              fontSize: 34,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF1E293B),
-                            ),
-                          ),
-                          TextSpan(
-                            text: 'ATM',
-                            style: TextStyle(
-                              fontSize: 34,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF16A34A),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    /// Tagline
-                    const Text(
-                      'Cleaner ATM. Better Experience.',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-
-                    const SizedBox(height: 50),
-
-                    /// Loading Indicator
-                    const SizedBox(
-                      width: 30,
-                      height: 30,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 3,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          Color(0xFF16A34A),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+          // Background illustration placeholder (Cities/Leaves at bottom)
+          Positioned(
+            bottom: -20,
+            left: 0,
+            right: 0,
+            child: Opacity(
+              opacity: 0.1,
+              child: Image.network(
+                'https://img.freepik.com/free-vector/city-skyline-concept-illustration_114360-803.jpg', 
+                height: 300, 
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
               ),
+            ),
+          ),
+
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Illustration Container
+                Container(
+                  width: 140,
+                  height: 140,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF10B981).withOpacity(0.08),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.atm_rounded, 
+                      size: 80, 
+                      color: const Color(0xFF10B981).withOpacity(0.8)
+                    ),
+                  ),
+                ),
+                
+                const SizedBox(height: 35),
+
+                // App Name
+                RichText(
+                  text: const TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'Clean',
+                        style: TextStyle(
+                          fontSize: 34,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFF1E293B),
+                          letterSpacing: -1,
+                        ),
+                      ),
+                      TextSpan(
+                        text: 'ATM',
+                        style: TextStyle(
+                          fontSize: 34,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFF10B981),
+                          letterSpacing: -1,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                // Tagline
+                Text(
+                  'Cleaner ATM. Better Experience.',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+
+                const SizedBox(height: 60),
+
+                // Loading Indicator
+                const SizedBox(
+                  width: 35,
+                  height: 35,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF10B981)),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
     );
   }
-}
+}

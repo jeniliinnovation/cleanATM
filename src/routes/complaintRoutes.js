@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const fs = require('fs');
+const path = require('path');
 const complaintController = require('../controllers/complaintController');
 const { authenticate } = require('../middleware/authMiddleware');
 
@@ -21,10 +22,10 @@ const upload = multer({ storage: storage });
 
 router.use(authenticate);
 
-router.post('/', upload.single('photo'), complaintController.submitComplaint);
+router.post('/', upload.array('photo', 5), complaintController.submitComplaint);
 router.get('/', complaintController.getComplaints);
 router.get('/:complaint_id', complaintController.getComplaintDetails);
-router.put('/:complaint_id', upload.single('photo'), complaintController.updateComplaint);
+router.put('/:complaint_id', upload.array('photo', 5), complaintController.updateComplaint);
 router.delete('/:complaint_id', complaintController.deleteComplaint);
 router.get('/:complaint_id/photo', complaintController.getComplaintPhoto);
 
