@@ -91,7 +91,8 @@ exports.getComplaints = async (req, res) => {
 exports.getComplaintDetails = async (req, res) => {
   try {
     const complaint = await Complaint.findOne({
-      where: { complaint_id: req.params.complaint_id, user_id: req.user.user_id }
+      where: { complaint_id: req.params.complaint_id, user_id: req.user.user_id },
+      include: [{ model: ATM }]
     });
     if (!complaint) return res.status(404).json({ success: false, message: 'Complaint not found' });
     

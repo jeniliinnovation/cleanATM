@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../services/api_service.dart';
+import '../../utils/app_colors.dart';
 import 'complaint_detail_screen.dart';
 import 'edit_report_screen.dart';
 import 'package:intl/intl.dart';
@@ -66,7 +67,7 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
     final filtered = _filteredComplaints;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FFF9),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -74,14 +75,18 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
         leading: IconButton(
           icon: Container(
             padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))]),
-            child: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF1E293B), size: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
+            ),
+            child: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 16),
           ),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Incident Lab',
-          style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.w900, fontSize: 20, letterSpacing: -0.8)
+          style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w900, fontSize: 20, letterSpacing: -0.8),
         ),
       ),
       body: Stack(
@@ -94,7 +99,7 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
               width: 250,
               height: 250,
               decoration: BoxDecoration(
-                color: const Color(0xFF10B981).withOpacity(0.03),
+                color: AppColors.primary.withOpacity(0.03),
                 shape: BoxShape.circle,
               ),
               child: BackdropFilter(
@@ -114,12 +119,12 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
                   children: [
                     const Text(
                       'Monitoring',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: Color(0xFF10B981), letterSpacing: 1.5),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: AppColors.primary, letterSpacing: 1.5),
                     ),
                     const SizedBox(height: 6),
                     const Text(
                       'Your Records',
-                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: Color(0xFF1E293B), letterSpacing: -1.0),
+                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: AppColors.textPrimary, letterSpacing: -1.0),
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -138,10 +143,10 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
               // List
               Expanded(
                 child: _isLoading
-                  ? const Center(child: CircularProgressIndicator(color: Color(0xFF10B981)))
+                  ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
                   : RefreshIndicator(
                       onRefresh: _fetchComplaints,
-                      color: const Color(0xFF10B981),
+                      color: AppColors.primary,
                       child: filtered.isEmpty
                         ? _buildEmptyState()
                         : ListView.builder(
@@ -177,20 +182,20 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
               margin: const EdgeInsets.only(right: 12),
               padding: const EdgeInsets.symmetric(horizontal: 24),
               decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFF10B981) : Colors.white,
+                color: isSelected ? AppColors.primary : Colors.white,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: isSelected ? [
-                  BoxShadow(color: const Color(0xFF10B981).withOpacity(0.2), blurRadius: 12, offset: const Offset(0, 6))
+                  BoxShadow(color: AppColors.primary.withOpacity(0.2), blurRadius: 12, offset: const Offset(0, 6))
                 ] : [
                   BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))
                 ],
-                border: Border.all(color: isSelected ? Colors.transparent : const Color(0xFFF1F5F9)),
+                border: Border.all(color: isSelected ? Colors.transparent : AppColors.border),
               ),
               child: Center(
                 child: Text(
                   filter,
                   style: TextStyle(
-                    color: isSelected ? Colors.white : const Color(0xFF64748B),
+                    color: isSelected ? Colors.white : AppColors.textSecondary,
                     fontWeight: FontWeight.w900,
                     fontSize: 13,
                     letterSpacing: -0.2,
@@ -236,7 +241,7 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(28),
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 20, offset: const Offset(0, 10))],
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        border: Border.all(color: AppColors.border),
       ),
       child: InkWell(
         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ComplaintDetailScreen(complaint: c))),
@@ -251,10 +256,10 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(10)),
+                    decoration: BoxDecoration(color: AppColors.surfaceMuted, borderRadius: BorderRadius.circular(10)),
                     child: Text(
                       '#CMP${c['complaint_id'].toString().substring(0, 8).toUpperCase()}',
-                      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 11, color: Color(0xFF64748B), letterSpacing: 0.5),
+                      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 11, color: AppColors.textSecondary, letterSpacing: 0.5),
                     ),
                   ),
                   _buildPrimeStatusBadge(status),
@@ -263,12 +268,12 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
               const SizedBox(height: 20),
               Text(
                 bankName,
-                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Color(0xFF1E293B), letterSpacing: -0.5),
+                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.textPrimary, letterSpacing: -0.5),
               ),
               const SizedBox(height: 6),
               Row(
                 children: [
-                  const Icon(Icons.location_on_rounded, size: 14, color: Color(0xFF10B981)),
+                  const Icon(Icons.location_on_rounded, size: 14, color: AppColors.primary),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
@@ -281,7 +286,7 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
                 ],
               ),
               const SizedBox(height: 20),
-              const Divider(height: 1, color: Color(0xFFF1F5F9)),
+              const Divider(height: 1, color: AppColors.border),
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -289,20 +294,29 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
                   if (canEdit)
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(color: const Color(0xFF3B82F6).withOpacity(0.08), borderRadius: BorderRadius.circular(8)),
+                      decoration: BoxDecoration(color: AppColors.accentBlue.withOpacity(0.08), borderRadius: BorderRadius.circular(8)),
                       child: const Row(
                         children: [
-                          Icon(Icons.edit_rounded, size: 12, color: Color(0xFF3B82F6)),
+                          Icon(Icons.edit_rounded, size: 12, color: AppColors.accentBlue),
                           SizedBox(width: 4),
-                          Text('CAN EDIT', style: TextStyle(color: Color(0xFF3B82F6), fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
+                          Text('CAN EDIT', style: TextStyle(color: AppColors.accentBlue, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
                         ],
                       ),
                     )
                   else
                     const SizedBox(),
+                  const Text(
+                    '',
+                    style: TextStyle(color: AppColors.textMuted, fontSize: 12, fontWeight: FontWeight.w800),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
                   Text(
                     dateStr,
-                    style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12, fontWeight: FontWeight.w800),
+                    style: const TextStyle(color: AppColors.textMuted, fontSize: 12, fontWeight: FontWeight.w800),
                   ),
                 ],
               ),
@@ -327,7 +341,7 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
         background: Container(
           margin: const EdgeInsets.only(bottom: 20),
           decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [const Color(0xFF10B981).withOpacity(0.15), const Color(0xFF10B981).withOpacity(0.05)]),
+            gradient: LinearGradient(colors: [AppColors.primary.withOpacity(0.15), AppColors.primary.withOpacity(0.05)]),
             borderRadius: BorderRadius.circular(28),
           ),
           padding: const EdgeInsets.only(left: 32),
@@ -339,17 +353,17 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
-                  boxShadow: [BoxShadow(color: const Color(0xFF10B981).withOpacity(0.1), blurRadius: 15, offset: const Offset(0, 4))],
+                  boxShadow: [BoxShadow(color: AppColors.primary.withOpacity(0.1), blurRadius: 15, offset: const Offset(0, 4))],
                 ),
-                child: const Icon(Icons.edit_note_rounded, color: Color(0xFF10B981), size: 30),
+                child: const Icon(Icons.edit_note_rounded, color: AppColors.primary, size: 30),
               ),
               const SizedBox(width: 16),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                   Text('Modify Record', style: TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: -0.5)),
-                   Text('Swipe to open editor', style: TextStyle(color: const Color(0xFF10B981).withOpacity(0.7), fontWeight: FontWeight.w700, fontSize: 11)),
+                   const Text('Modify Record', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: -0.5)),
+                   Text('Swipe to open editor', style: TextStyle(color: AppColors.primary.withOpacity(0.7), fontWeight: FontWeight.w700, fontSize: 11)),
                 ],
               ),
             ],
@@ -370,24 +384,24 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
     switch (status.toLowerCase()) {
       case 'resolved':
       case 'completed':
-        color = const Color(0xFF10B981);
+        color = AppColors.success;
         text = 'RESOLVED';
-        bgColor = const Color(0xFF10B981).withOpacity(0.12);
+        bgColor = AppColors.success.withOpacity(0.12);
         break;
       case 'in_progress':
-        color = const Color(0xFF3B82F6);
+        color = AppColors.accentBlue;
         text = 'IN PROGRESS';
-        bgColor = const Color(0xFF3B82F6).withOpacity(0.12);
+        bgColor = AppColors.accentBlue.withOpacity(0.12);
         break;
       case 'rejected':
-        color = const Color(0xFFEF4444);
+        color = AppColors.error;
         text = 'REJECTED';
-        bgColor = const Color(0xFFEF4444).withOpacity(0.12);
+        bgColor = AppColors.error.withOpacity(0.12);
         break;
       default:
-        color = const Color(0xFFF59E0B);
+        color = AppColors.warning;
         text = 'PENDING';
-        bgColor = const Color(0xFFF59E0B).withOpacity(0.12);
+        bgColor = AppColors.warning.withOpacity(0.12);
     }
 
     return Container(
@@ -407,18 +421,18 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
         children: [
           Container(
             padding: const EdgeInsets.all(30),
-            decoration: BoxDecoration(color: const Color(0xFFF1F5F9), shape: BoxShape.circle),
+            decoration: const BoxDecoration(color: AppColors.surfaceMuted, shape: BoxShape.circle),
             child: Icon(Icons.assignment_rounded, size: 60, color: Colors.grey.shade300),
           ),
           const SizedBox(height: 25),
           const Text(
             'Clear as Day', 
-            style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.w900, fontSize: 20)
+            style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w900, fontSize: 20),
           ),
           const SizedBox(height: 8),
           Text(
             'No active incidents found in this filter.', 
-            style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.w600, fontSize: 15)
+            style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.w600, fontSize: 15),
           ),
         ],
       ),

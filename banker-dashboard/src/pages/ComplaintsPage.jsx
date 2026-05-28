@@ -361,19 +361,44 @@ export default function ComplaintsPage() {
                   </div>
                 )}
               </div>
-              {selectedComplaint.photo_url && (
-                <div style={{ marginTop: 16 }}>
-                  <label className="form-label" style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <ImageIcon size={14} /> Attached Photo
-                  </label>
-                  <img
-                    src={`http://localhost:5000/${selectedComplaint.photo_url}`}
-                    alt="Complaint"
-                    className="complaint-photo"
-                    onError={(e) => { e.target.style.display = 'none'; }}
-                  />
-                </div>
-              )}
+              {/* Images Section */}
+              {/* Images Section */}
+              <div style={{ marginTop: 24 }}>
+                <label className="form-label" style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-secondary)' }}>
+                  <ImageIcon size={16} /> Visual Evidence
+                </label>
+                
+                {((selectedComplaint.photo_urls && selectedComplaint.photo_urls.length > 0) || selectedComplaint.photo_url) ? (
+                  <div className="detail-image-gallery">
+                    {selectedComplaint.photo_urls && selectedComplaint.photo_urls.length > 0 ? (
+                      selectedComplaint.photo_urls.map((url, idx) => (
+                        <div key={idx} className="detail-image-wrapper">
+                          <img
+                            src={`http://localhost:5000/${url.replace(/\\/g, '/')}`}
+                            alt={`Evidence ${idx + 1}`}
+                            onClick={() => window.open(`http://localhost:5000/${url.replace(/\\/g, '/')}`, '_blank')}
+                            onError={(e) => { e.target.src = 'https://via.placeholder.com/400x300?text=Image+Not+Found'; }}
+                          />
+                        </div>
+                      ))
+                    ) : (
+                      <div className="detail-image-wrapper">
+                        <img
+                          src={`http://localhost:5000/${selectedComplaint.photo_url.replace(/\\/g, '/')}`}
+                          alt="Evidence"
+                          onClick={() => window.open(`http://localhost:5000/${selectedComplaint.photo_url.replace(/\\/g, '/')}`, '_blank')}
+                          onError={(e) => { e.target.src = 'https://via.placeholder.com/400x300?text=Image+Not+Found'; }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="no-evidence-placeholder">
+                    <ImageIcon size={32} />
+                    <p>No visual evidence was attached to this complaint.</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

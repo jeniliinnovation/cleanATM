@@ -59,7 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FFF9),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -67,7 +67,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: const Text(
           'Account Profile',
           style: TextStyle(
-            color: Color(0xFF1E293B),
+            color: AppColors.textPrimary,
             fontWeight: FontWeight.w900,
             fontSize: 20,
             letterSpacing: -0.5,
@@ -127,7 +127,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 child: const CircleAvatar(
                                   radius: 45,
-                                  backgroundColor: Color(0xFFF1F5F9),
+                                  backgroundColor: AppColors.surfaceMuted,
                                   child: Icon(Icons.person_rounded, size: 50, color: AppColors.primary),
                                 ),
                               ),
@@ -137,7 +137,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 style: const TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight.w900,
-                                  color: Color(0xFF1E293B),
+                                  color: AppColors.textPrimary,
                                   letterSpacing: -0.5,
                                 ),
                               ),
@@ -176,7 +176,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
-                        color: Color(0xFF64748B),
+                        color: AppColors.textSecondary,
                         letterSpacing: 1.2,
                       ),
                     ),
@@ -278,17 +278,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
           leading: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFF1F5F9),
+              color: AppColors.surfaceMuted,
               borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(icon, color: const Color(0xFF64748B), size: 22),
+            child: Icon(icon, color: AppColors.textSecondary, size: 22),
           ),
           title: Text(
             title,
             style: const TextStyle(
               fontWeight: FontWeight.w800,
               fontSize: 15,
-              color: Color(0xFF1E293B),
+              color: AppColors.textPrimary,
             ),
           ),
           subtitle: Text(
@@ -299,7 +299,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          trailing: const Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFFCBD5E1), size: 14),
+          trailing: const Icon(Icons.arrow_forward_ios_rounded, color: AppColors.borderMuted, size: 14),
         ),
       ),
     );

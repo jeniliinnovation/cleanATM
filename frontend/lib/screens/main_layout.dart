@@ -33,10 +33,7 @@ class _MainLayoutState extends State<MainLayout> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _pages,
-      ),
+      body: IndexedStack(index: _selectedIndex, children: _pages),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Container(
         height: 70,
@@ -57,7 +54,10 @@ class _MainLayoutState extends State<MainLayout> {
         ),
         child: FloatingActionButton(
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const FileReportScreen()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const FileReportScreen()),
+            );
           },
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -89,11 +89,31 @@ class _MainLayoutState extends State<MainLayout> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildNavItem(Icons.grid_view_rounded, Icons.grid_view_rounded, 'Home', 0),
-                _buildNavItem(Icons.account_balance_rounded, Icons.account_balance_outlined, 'Banks', 1),
+                _buildNavItem(
+                  Icons.grid_view_rounded,
+                  Icons.grid_view_rounded,
+                  'Home',
+                  0,
+                ),
+                _buildNavItem(
+                  Icons.account_balance_rounded,
+                  Icons.account_balance_outlined,
+                  'Banks',
+                  1,
+                ),
                 const SizedBox(width: 60), // Space for FAB
-                _buildNavItem(Icons.assignment_rounded, Icons.assignment_outlined, 'History', 2),
-                _buildNavItem(Icons.person_rounded, Icons.person_outlined, 'Profile', 3),
+                _buildNavItem(
+                  Icons.assignment_rounded,
+                  Icons.assignment_outlined,
+                  'History',
+                  2,
+                ),
+                _buildNavItem(
+                  Icons.person_rounded,
+                  Icons.person_outlined,
+                  'Profile',
+                  3,
+                ),
               ],
             ),
           ),
@@ -102,10 +122,17 @@ class _MainLayoutState extends State<MainLayout> {
     );
   }
 
-  Widget _buildNavItem(IconData activeIcon, IconData inactiveIcon, String label, int index) {
+  Widget _buildNavItem(
+    IconData activeIcon,
+    IconData inactiveIcon,
+    String label,
+    int index,
+  ) {
     final isSelected = _selectedIndex == index;
-    final color = isSelected ? const Color(0xFF10B981) : const Color(0xFF94A3B8);
-    
+    final color = isSelected
+        ? const Color(0xFF10B981)
+        : const Color(0xFF94A3B8);
+
     return Expanded(
       child: InkWell(
         onTap: () => _onItemTapped(index),

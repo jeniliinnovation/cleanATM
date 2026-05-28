@@ -169,6 +169,19 @@ class ApiService {
     }
   }
 
+  static Future<Map<String, dynamic>> getComplaintDetails(String id) async {
+    try {
+      final token = await _getToken();
+      final res = await http.get(
+        Uri.parse('$baseUrl/complaints/$id'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      return jsonDecode(res.body);
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
   static Future<Map<String, dynamic>> submitComplaint({
     required String atmId,
     required String complaintType,

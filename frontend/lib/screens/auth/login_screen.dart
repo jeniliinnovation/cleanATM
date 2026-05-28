@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/api_service.dart';
+import '../../utils/app_colors.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -58,11 +59,10 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FFF9),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -77,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.w900,
-                    color: Color(0xFF1E293B),
+                    color: AppColors.textPrimary,
                     letterSpacing: -0.5,
                   ),
                 ),
@@ -98,15 +98,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: const EdgeInsets.all(12),
                     margin: const EdgeInsets.only(bottom: 16),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.05),
+                      color: AppColors.error.withOpacity(0.05),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.red.withOpacity(0.1)),
+                      border: Border.all(color: AppColors.error.withOpacity(0.1)),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.error_outline_rounded, color: Colors.redAccent, size: 20),
+                        Icon(Icons.error_outline_rounded, color: AppColors.error, size: 20),
                         const SizedBox(width: 10),
-                        Expanded(child: Text(_errorMessage!, style: const TextStyle(color: Colors.redAccent, fontSize: 13, fontWeight: FontWeight.w600))),
+                        Expanded(child: Text(_errorMessage!, style: TextStyle(color: AppColors.error, fontSize: 13, fontWeight: FontWeight.w600))),
                       ],
                     ),
                   ),
@@ -115,27 +115,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Illustration placeholder
                 Center(
                   child: Container(
-                    height: 160,
+                    height: 180,
+                    width: 180,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withOpacity(0.05),
+                      color: AppColors.primary.withOpacity(0.05),
                       borderRadius: BorderRadius.circular(30),
                     ),
                     child: Center(
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Icon(Icons.atm_rounded, size: 100, color: const Color(0xFF10B981).withOpacity(0.8)),
-                          Positioned(
-                            bottom: 10,
-                            child: Container(
-                              height: 4, width: 60,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF10B981).withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(2),
-                              ),
-                            ),
-                          )
-                        ],
+                      child: Image.asset(
+                        'assets/images/atm_clean_logo.png',
+                        height: 150,
+                        fit: BoxFit.contain,
                       ),
                     ),
                   ),
@@ -170,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       'Forgot Password?',
                       style: TextStyle(
                         fontSize: 13,
-                        color: Color(0xFF10B981),
+                        color: AppColors.primary,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -186,11 +176,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(18),
                     gradient: const LinearGradient(
-                      colors: [Color(0xFF10B981), Color(0xFF059669)],
+                      colors: [AppColors.primary, AppColors.primaryDark],
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF10B981).withOpacity(0.25),
+                        color: AppColors.primary.withOpacity(0.25),
                         blurRadius: 15,
                         offset: const Offset(0, 8),
                       ),
@@ -231,7 +221,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text(
                         'Register',
                         style: TextStyle(
-                          color: Color(0xFF10B981),
+                          color: AppColors.primary,
                           fontWeight: FontWeight.w800,
                           fontSize: 14,
                         ),
@@ -272,13 +262,13 @@ class _LoginScreenState extends State<LoginScreen> {
         controller: controller,
         obscureText: obscure,
         keyboardType: keyboardType,
-        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: Color(0xFF1E293B)),
+        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppColors.textPrimary),
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: TextStyle(color: Colors.grey.shade400, fontWeight: FontWeight.w600),
           prefixIcon: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Icon(icon, color: const Color(0xFF10B981), size: 22),
+            child: Icon(icon, color: AppColors.primary, size: 22),
           ),
           suffixIcon: isPassword 
             ? IconButton(
@@ -296,7 +286,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(18),
-            borderSide: const BorderSide(color: Color(0xFF10B981), width: 1.5),
+            borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
           ),
           contentPadding: const EdgeInsets.symmetric(vertical: 18),
         ),

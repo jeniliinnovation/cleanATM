@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../complaints/file_report_screen.dart';
 import '../../services/api_service.dart';
+import '../../utils/app_colors.dart';
 
 class AtmListScreen extends StatefulWidget {
   final String? filterBank;
@@ -179,29 +180,29 @@ class _AtmListScreenState extends State<AtmListScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                   const Text('Advanced Filters', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Color(0xFF1E293B), letterSpacing: -0.8)),
+                   const Text('Advanced Filters', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AppColors.textPrimary, letterSpacing: -0.8)),
                    IconButton(
                      icon: Container(
                        padding: const EdgeInsets.all(6),
-                       decoration: BoxDecoration(color: const Color(0xFFF1F5F9), shape: BoxShape.circle),
-                       child: const Icon(Icons.close_rounded, color: Color(0xFF64748B), size: 18),
+                       decoration: const BoxDecoration(color: AppColors.surfaceMuted, shape: BoxShape.circle),
+                       child: const Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 18),
                      ),
-                     onPressed: () => Navigator.pop(ctx)
+                     onPressed: () => Navigator.pop(ctx),
                    ),
                 ],
               ),
               const SizedBox(height: 30),
-              _buildFilterSwitch('Saved & Bookmarked', Icons.bookmark_rounded, const Color(0xFF10B981), _showBookmarkedOnly, (v) {
+              _buildFilterSwitch('Saved & Bookmarked', Icons.bookmark_rounded, AppColors.primary, _showBookmarkedOnly, (v) {
                 setModalState(() => _showBookmarkedOnly = v);
                 setState(() { _showBookmarkedOnly = v; _applyFilters(); });
               }),
               const SizedBox(height: 12),
-              _buildFilterSwitch('Nearby Terminals', Icons.my_location_rounded, const Color(0xFF3B82F6), _showNearbyOnly, (v) {
+              _buildFilterSwitch('Nearby Terminals', Icons.my_location_rounded, AppColors.accentBlue, _showNearbyOnly, (v) {
                 setModalState(() => _showNearbyOnly = v);
                 setState(() { _showNearbyOnly = v; _applyFilters(); });
               }),
               const SizedBox(height: 32),
-              const Text('Target City', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Color(0xFF94A3B8))),
+              const Text('Target City', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppColors.textMuted)),
               _buildDropdown(['All Cities', 'Delhi', 'Mumbai', 'Bangalore', 'Kolkata', 'Chennai', 'Hyderabad'], _activeCityFilter ?? 'All Cities', (v) {
                 setModalState(() => _activeCityFilter = v == 'All Cities' ? null : v);
                 setState(() { _activeCityFilter = v == 'All Cities' ? null : v; _applyFilters(); });
@@ -212,7 +213,7 @@ class _AtmListScreenState extends State<AtmListScreen> {
                 height: 60,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  gradient: const LinearGradient(colors: [Color(0xFF10B981), Color(0xFF059669)]),
+                  gradient: const LinearGradient(colors: [AppColors.primary, AppColors.primaryDark]),
                 ),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
@@ -231,19 +232,19 @@ class _AtmListScreenState extends State<AtmListScreen> {
   Widget _buildFilterSwitch(String title, IconData icon, Color color, bool value, Function(bool) onChanged) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        border: Border.all(color: AppColors.border),
       ),
       child: SwitchListTile.adaptive(
-        title: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF1E293B))),
+        title: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
         secondary: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
           child: Icon(icon, color: color, size: 18),
         ),
         value: value,
-        activeColor: const Color(0xFF10B981),
+        activeColor: AppColors.primary,
         onChanged: onChanged,
       ),
     );
@@ -252,13 +253,13 @@ class _AtmListScreenState extends State<AtmListScreen> {
   Widget _buildDropdown(List<String> items, String value, Function(String?) onChanged) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-      decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(20), border: Border.all(color: const Color(0xFFF1F5F9))),
+      decoration: BoxDecoration(color: AppColors.surfaceLight, borderRadius: BorderRadius.circular(20), border: Border.all(color: AppColors.border)),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: value,
           isExpanded: true,
-          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF10B981)),
-          style: const TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.w700, fontSize: 15),
+          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.primary),
+          style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700, fontSize: 15),
           items: items.map((city) => DropdownMenuItem(value: city, child: Text(city))).toList(),
           onChanged: onChanged,
         ),
@@ -271,7 +272,7 @@ class _AtmListScreenState extends State<AtmListScreen> {
     bool showingAtms = _activeBankFilter != null;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FFF9),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -279,8 +280,12 @@ class _AtmListScreenState extends State<AtmListScreen> {
         leading: IconButton(
           icon: Container(
             padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))]),
-            child: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF1E293B), size: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
+            ),
+            child: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 16),
           ),
           onPressed: () {
             if (showingAtms) {
@@ -296,10 +301,10 @@ class _AtmListScreenState extends State<AtmListScreen> {
         ),
         title: Text(
           showingAtms ? 'Select Terminal' : 'Bank Bench', 
-          style: const TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.w900, fontSize: 20, letterSpacing: -0.8)
+          style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w900, fontSize: 20, letterSpacing: -0.8),
         ),
         actions: const [
-          SizedBox(width: 56), // To balance the leading back button
+          SizedBox(width: 56),
         ],
       ),
       body: Stack(
@@ -312,7 +317,7 @@ class _AtmListScreenState extends State<AtmListScreen> {
               width: 300,
               height: 300,
               decoration: BoxDecoration(
-                color: const Color(0xFF10B981).withOpacity(0.03),
+                color: AppColors.primary.withOpacity(0.03),
                 shape: BoxShape.circle,
               ),
               child: BackdropFilter(
@@ -333,12 +338,12 @@ class _AtmListScreenState extends State<AtmListScreen> {
                     children: [
                       const Text(
                         'Discover',
-                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: Color(0xFF10B981), letterSpacing: 1.5),
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: AppColors.primary, letterSpacing: 1.5),
                       ),
                       const SizedBox(height: 6),
                       const Text(
                         'Partner Banks',
-                        style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: Color(0xFF1E293B), letterSpacing: -1.0),
+                        style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: AppColors.textPrimary, letterSpacing: -1.0),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -371,7 +376,7 @@ class _AtmListScreenState extends State<AtmListScreen> {
                             decoration: InputDecoration(
                               hintText: 'Search bank or location...',
                               hintStyle: TextStyle(color: Colors.grey.shade300, fontSize: 14, fontWeight: FontWeight.w600),
-                              prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF10B981), size: 22),
+                              prefixIcon: const Icon(Icons.search_rounded, color: AppColors.primary, size: 22),
                               border: InputBorder.none,
                               contentPadding: const EdgeInsets.symmetric(vertical: 18),
                             ),
@@ -389,7 +394,7 @@ class _AtmListScreenState extends State<AtmListScreen> {
                             boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 20, offset: const Offset(0, 10))],
                             border: Border.all(color: Colors.grey.shade50),
                           ),
-                          child: const Icon(Icons.tune_rounded, color: Color(0xFF10B981), size: 22),
+                          child: const Icon(Icons.tune_rounded, color: AppColors.primary, size: 22),
                         ),
                       ),
                     ],
@@ -398,7 +403,7 @@ class _AtmListScreenState extends State<AtmListScreen> {
               ),
 
               if (_isLoading)
-                const SliverFillRemaining(child: Center(child: CircularProgressIndicator(color: Color(0xFF10B981))))
+                const SliverFillRemaining(child: Center(child: CircularProgressIndicator(color: AppColors.primary)))
               else if (showingAtms)
                 _buildAtmListView()
               else
@@ -433,15 +438,15 @@ class _AtmListScreenState extends State<AtmListScreen> {
                 leading: Container(
                   width: 56, height: 56,
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(18)),
+                  decoration: BoxDecoration(color: AppColors.surfaceLight, borderRadius: BorderRadius.circular(18)),
                   child: Center(child: _brandLogo(bank['logo'], size: 32)),
                 ),
-                title: Text(bank['name'], style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: Color(0xFF1E293B), letterSpacing: -0.5)),
+                title: Text(bank['name'], style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: AppColors.textPrimary, letterSpacing: -0.5)),
                 subtitle: Text('${bank['count']} Terminals Nearby', style: TextStyle(color: Colors.grey.shade400, fontSize: 13, fontWeight: FontWeight.w700)),
                 trailing: Container(
                   padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(color: const Color(0xFF10B981).withOpacity(0.05), shape: BoxShape.circle),
-                  child: const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: Color(0xFF10B981)),
+                  decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.05), shape: BoxShape.circle),
+                  child: const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: AppColors.primary),
                 ),
               ),
             );
@@ -501,28 +506,28 @@ class _AtmListScreenState extends State<AtmListScreen> {
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(10)),
+                    decoration: BoxDecoration(color: AppColors.surfaceMuted, borderRadius: BorderRadius.circular(10)),
                     child: Text(
                       'ID: #${atm['atm_id'].toString().toUpperCase()}',
-                      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 11, color: Color(0xFF64748B), letterSpacing: 0.5),
+                      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 11, color: AppColors.textSecondary, letterSpacing: 0.5),
                     ),
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(color: const Color(0xFF10B981).withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
-                    child: const Text('ACTIVE', style: TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.w900, fontSize: 10, letterSpacing: 1.0)),
+                    decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+                    child: const Text('ACTIVE', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w900, fontSize: 10, letterSpacing: 1.0)),
                   ),
                 ],
               ),
               const SizedBox(height: 20),
               Text(
                 atm['bank_name'] ?? 'ATM Terminal',
-                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 19, color: Color(0xFF1E293B), letterSpacing: -0.5),
+                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 19, color: AppColors.textPrimary, letterSpacing: -0.5),
               ),
               const SizedBox(height: 6),
               Row(
                 children: [
-                  const Icon(Icons.location_on_rounded, size: 14, color: Color(0xFF10B981)),
+                  const Icon(Icons.location_on_rounded, size: 14, color: AppColors.primary),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
@@ -535,20 +540,20 @@ class _AtmListScreenState extends State<AtmListScreen> {
                 ],
               ),
               const SizedBox(height: 20),
-              const Divider(height: 1, color: Color(0xFFF1F5F9)),
+              const Divider(height: 1, color: AppColors.border),
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     atm['city'] ?? 'Location Available',
-                    style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12, fontWeight: FontWeight.w800),
+                    style: const TextStyle(color: AppColors.textMuted, fontSize: 12, fontWeight: FontWeight.w800),
                   ),
                   GestureDetector(
                     onTap: () => _toggleBookmark(atm['atm_id'].toString()),
                     child: Icon(
                       _bookmarkedAtmIds.contains(atm['atm_id'].toString()) ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
-                      size: 24, color: const Color(0xFF10B981),
+                      size: 24, color: AppColors.primary,
                     ),
                   ),
                 ],
@@ -559,7 +564,6 @@ class _AtmListScreenState extends State<AtmListScreen> {
       ),
     );
   }
-
 
   void _showAtmDetails(Map<String, dynamic> atm) {
     showModalBottomSheet(
@@ -587,7 +591,7 @@ class _AtmListScreenState extends State<AtmListScreen> {
                   Container(
                     width: 76, height: 76,
                     padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(color: const Color(0xFF10B981).withOpacity(0.06), borderRadius: BorderRadius.circular(24)),
+                    decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.06), borderRadius: BorderRadius.circular(24)),
                     child: Center(child: _brandLogo(ApiService.getBankLogo(atm['bank_name'] ?? ''), size: 45)),
                   ),
                   const SizedBox(width: 20),
@@ -597,12 +601,12 @@ class _AtmListScreenState extends State<AtmListScreen> {
                       children: [
                         Text(
                           '${atm['bank_name'] ?? 'ATM'} Terminal', 
-                          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF1E293B), letterSpacing: -0.8)
+                          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.textPrimary, letterSpacing: -0.8),
                         ),
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            const Icon(Icons.location_on_rounded, size: 14, color: Color(0xFF10B981)),
+                            const Icon(Icons.location_on_rounded, size: 14, color: AppColors.primary),
                             const SizedBox(width: 4),
                             Text(atm['city'] ?? 'Location Available', style: TextStyle(color: Colors.grey.shade500, fontSize: 13, fontWeight: FontWeight.w700)),
                           ],
@@ -610,8 +614,8 @@ class _AtmListScreenState extends State<AtmListScreen> {
                         const SizedBox(height: 12),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(color: const Color(0xFF10B981).withOpacity(0.12), borderRadius: BorderRadius.circular(100)),
-                          child: const Text('STATUS: ACTIVE', style: TextStyle(color: Color(0xFF10B981), fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 1.0)),
+                          decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.12), borderRadius: BorderRadius.circular(100)),
+                          child: const Text('STATUS: ACTIVE', style: TextStyle(color: AppColors.primary, fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 1.0)),
                         ),
                       ],
                     ),
@@ -631,8 +635,8 @@ class _AtmListScreenState extends State<AtmListScreen> {
                 height: 62,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(22),
-                  gradient: const LinearGradient(colors: [Color(0xFF10B981), Color(0xFF059669)]),
-                  boxShadow: [BoxShadow(color: const Color(0xFF10B981).withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10))],
+                  gradient: const LinearGradient(colors: [AppColors.primary, AppColors.primaryDark]),
+                  boxShadow: [BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10))],
                 ),
                 child: ElevatedButton(
                   onPressed: () {
@@ -653,23 +657,23 @@ class _AtmListScreenState extends State<AtmListScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(24), border: Border.all(color: const Color(0xFFF1F5F9))),
+      decoration: BoxDecoration(color: AppColors.surfaceLight, borderRadius: BorderRadius.circular(24), border: Border.all(color: AppColors.border)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4))]),
-            child: Icon(icon, size: 20, color: const Color(0xFF10B981)),
+            child: Icon(icon, size: 20, color: AppColors.primary),
           ),
           const SizedBox(width: 18),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 0.8)),
+                Text(label, style: const TextStyle(color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 0.8)),
                 const SizedBox(height: 4),
-                Text(value, style: const TextStyle(color: Color(0xFF1E293B), fontSize: 15, fontWeight: FontWeight.w700, height: 1.4)),
+                Text(value, style: const TextStyle(color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w700, height: 1.4)),
               ],
             ),
           ),
@@ -679,10 +683,10 @@ class _AtmListScreenState extends State<AtmListScreen> {
   }
 
   Widget _brandLogo(String path, {double size = 50}) {
-    if (path.isEmpty) return Icon(Icons.business_rounded, size: size * 0.7, color: const Color(0xFF10B981));
+    if (path.isEmpty) return Icon(Icons.business_rounded, size: size * 0.7, color: AppColors.primary);
     if (path.contains('logos/')) {
-      return Image.asset('assets/' + path, height: size, fit: BoxFit.contain, errorBuilder: (_, __, ___) => Icon(Icons.business_rounded, size: size * 0.7, color: const Color(0xFF10B981)));
+      return Image.asset('assets/' + path, height: size, fit: BoxFit.contain, errorBuilder: (_, __, ___) => Icon(Icons.business_rounded, size: size * 0.7, color: AppColors.primary));
     }
-    return Image.network(path, height: size, fit: BoxFit.contain, errorBuilder: (_, __, ___) => Icon(Icons.business_rounded, size: size * 0.7, color: const Color(0xFF10B981)));
+    return Image.network(path, height: size, fit: BoxFit.contain, errorBuilder: (_, __, ___) => Icon(Icons.business_rounded, size: size * 0.7, color: AppColors.primary));
   }
 }

@@ -22,7 +22,12 @@ import {
 import { useTheme } from '../context/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
 
-const COLORS = ['#f59e0b', '#3b82f6', '#10b981', '#ef4444'];
+const STATUS_COLORS = {
+  'Pending': '#f59e0b',
+  'In Progress': '#3b82f6',
+  'Resolved': '#10b981',
+  'Rejected': '#ef4444'
+};
 
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
@@ -87,10 +92,10 @@ export default function DashboardPage() {
   }
 
   const pieData = [
-    { name: 'Pending', value: stats.pending },
-    { name: 'In Progress', value: stats.in_progress },
-    { name: 'Resolved', value: stats.resolved },
-    { name: 'Rejected', value: stats.rejected },
+    { name: 'Pending', value: stats.pending || 0 },
+    { name: 'In Progress', value: stats.in_progress || 0 },
+    { name: 'Resolved', value: stats.resolved || 0 },
+    { name: 'Rejected', value: stats.rejected || 0 },
   ].filter((d) => d.value > 0);
 
   // Synthetic bar data for demo
@@ -215,9 +220,9 @@ export default function DashboardPage() {
         {/* Stat Cards */}
         <div className="stats-grid">
           {/* ... (keep existing stat blocks but ensure they use CSS variables) ... */}
-          <div className="stat-card blue">
+          <div className="stat-card primary">
             <div className="stat-card-top">
-              <div className="stat-card-icon blue">
+              <div className="stat-card-icon primary">
                 <BarChart3 />
               </div>
               <div className="stat-card-trend up">
@@ -281,7 +286,7 @@ export default function DashboardPage() {
                 <span>0%</span>
               </div>
             </div>
-            <h3>{stats.rejected}</h3>
+            <h3>{stats.rejected || 0}</h3>
             <p>Rejected</p>
           </div>
         </div>
@@ -302,8 +307,8 @@ export default function DashboardPage() {
                   dataKey="value"
                   label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                 >
-                  {pieData.map((_, index) => (
-                    <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                  {pieData.map((entry, index) => (
+                    <Cell key={index} fill={STATUS_COLORS[entry.name] || '#64748b'} />
                   ))}
                 </Pie>
                 <Tooltip

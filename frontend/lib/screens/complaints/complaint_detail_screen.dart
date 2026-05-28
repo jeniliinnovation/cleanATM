@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../services/api_service.dart';
 import 'edit_report_screen.dart';
 
 class ComplaintDetailScreen extends StatefulWidget {
@@ -17,13 +18,39 @@ class _ComplaintDetailScreenState extends State<ComplaintDetailScreen> {
   Timer? _timer;
   Duration _remainingTime = Duration.zero;
   bool _isClosed = false;
+  Map<String, dynamic>? _freshComplaint;
+  bool _loadingFresh = true;
 
   @override
   void initState() {
     super.initState();
     _calculateRemainingTime();
     _startTimer();
+    _fetchFreshData();
   }
+
+  Future<void> _fetchFreshData() async {
+    final id = widget.complaint['complaint_id']?.toString() ?? '';
+    if (id.isEmpty) {
+      setState(() => _loadingFresh = false);
+      return;
+    }
+    try {
+      final res = await ApiService.getComplaintDetails(id);
+      if (res['success'] == true && res['data'] != null) {
+        setState(() {
+          _freshComplaint = res['data'];
+          _loadingFresh = false;
+        });
+      } else {
+        setState(() => _loadingFresh = false);
+      }
+    } catch (_) {
+      setState(() => _loadingFresh = false);
+    }
+  }
+
+  Map<String, dynamic> get _complaint => _freshComplaint ?? widget.complaint;
 
   @override
   void dispose() {
@@ -75,7 +102,6 @@ class _ComplaintDetailScreenState extends State<ComplaintDetailScreen> {
 
   /// Build the full image URL from a stored path like "uploads/complaints/xxx.png"
   String _buildImageUrl(String path) {
-    // Remove leading slash if any
     final cleanPath = path.startsWith('/') ? path.substring(1) : path;
     return 'http://localhost:5000/$cleanPath';
   }
@@ -83,7 +109,7 @@ class _ComplaintDetailScreenState extends State<ComplaintDetailScreen> {
   /// Collect all photo URLs from both photo_url and photo_urls fields
   List<String> _getAllPhotoUrls() {
     final List<String> urls = [];
-    final photoUrls = widget.complaint['photo_urls'];
+    final photoUrls = _complaint['photo_urls'];
     if (photoUrls != null) {
       if (photoUrls is List) {
         for (var url in photoUrls) {
@@ -96,7 +122,7 @@ class _ComplaintDetailScreenState extends State<ComplaintDetailScreen> {
       }
     }
     if (urls.isEmpty) {
-      final singleUrl = widget.complaint['photo_url'];
+      final singleUrl = _complaint['photo_url'];
       if (singleUrl != null && singleUrl.toString().isNotEmpty) {
         urls.add(singleUrl.toString());
       }
@@ -106,12 +132,12 @@ class _ComplaintDetailScreenState extends State<ComplaintDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final atmData = widget.complaint['ATM'] ?? {};
-    final title = atmData['bank_name'] ?? widget.complaint['bank_name'] ?? 'ATM Terminal';
-    final id = widget.complaint['complaint_id']?.toString() ?? '';
+    final atmData = _complaint['ATM'] ?? widget.complaint['ATM'] ?? {};
+    final title = atmData['bank_name'] ?? _complaint['bank_name'] ?? 'ATM Terminal';
+    final id = _complaint['complaint_id']?.toString() ?? '';
     final shortId = id.length > 8 ? id.substring(0, 8).toUpperCase() : id.toUpperCase();
     
-    final dateRaw = widget.complaint['createdAt'] ?? widget.complaint['created_at'];
+    final dateRaw = _complaint['createdAt'] ?? _complaint['created_at'];
     String dateStr = '-- --- ----';
     if (dateRaw != null) {
       try {
@@ -159,6 +185,17 @@ class _ComplaintDetailScreenState extends State<ComplaintDetailScreen> {
               ),
             ),
           ),
+
+          // Loading indicator while fetching fresh data
+          if (_loadingFresh)
+            Positioned(
+              top: 0, left: 0, right: 0,
+              child: LinearProgressIndicator(
+                backgroundColor: Colors.transparent,
+                color: const Color(0xFF10B981).withOpacity(0.5),
+                minHeight: 2,
+              ),
+            ),
 
           SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
@@ -243,8 +280,8 @@ class _ComplaintDetailScreenState extends State<ComplaintDetailScreen> {
                 const SizedBox(height: 35),
                 _buildPrimeSectionHeader('Operational Intelligence'),
                 const SizedBox(height: 16),
-                _buildModernDetailItem(Icons.description_rounded, 'Incident Description', widget.complaint['description'] ?? 'No details provided.', color: const Color(0xFF3B82F6)),
-                _buildModernDetailItem(Icons.category_rounded, 'Issue Category', (widget.complaint['complaint_type'] ?? 'General').toString().replaceAll('_', ' ').toUpperCase(), color: const Color(0xFFF59E0B)),
+                _buildModernDetailItem(Icons.description_rounded, 'Incident Description', _complaint['description'] ?? 'No details provided.', color: const Color(0xFF3B82F6)),
+                _buildModernDetailItem(Icons.category_rounded, 'Issue Category', (_complaint['complaint_type'] ?? 'General').toString().replaceAll('_', ' ').toUpperCase(), color: const Color(0xFFF59E0B)),
                 
                 const SizedBox(height: 35),
                 _buildPrimeSectionHeader('Visual Evidence'),
@@ -296,16 +333,127 @@ class _ComplaintDetailScreenState extends State<ComplaintDetailScreen> {
                   icon: Icons.radio_button_checked_rounded,
                   color: const Color(0xFF10B981),
                 ),
-                _buildPrimeTimelineItem(
-                  _isClosed ? 'Session Closed' : 'Tracking Active',
-                  _isClosed ? 'The 2h resolution window has expired.' : 'Real-time monitoring is currently active.',
-                  isCompleted: _isClosed,
-                  isLast: true,
-                  icon: _isClosed ? Icons.lock_rounded : Icons.sensors_rounded,
-                  color: _isClosed ? const Color(0xFF64748B) : const Color(0xFF3B82F6),
-                ),
+                
+                // In Progress step
+                if (_complaint['status'] == 'in_progress' || _complaint['status'] == 'resolved' || _complaint['status'] == 'rejected')
+                  _buildPrimeTimelineItem(
+                    'Analysis Underway',
+                    'A technician/manager is currently reviewing the incident.',
+                    isCompleted: true,
+                    icon: Icons.biotech_rounded,
+                    color: const Color(0xFF3B82F6),
+                  ),
+
+                // Final Step: Resolved or Rejected
+                if (_complaint['status'] == 'resolved')
+                  _buildPrimeTimelineItem(
+                    'Incident Resolved',
+                    _complaint['remarks'] != null && _complaint['remarks'].toString().isNotEmpty
+                      ? 'Note: ${_complaint['remarks']}'
+                      : 'The issue has been successfully addressed and closed.',
+                    isCompleted: true,
+                    isLast: true,
+                    icon: Icons.check_circle_rounded,
+                    color: const Color(0xFF10B981),
+                  )
+                else if (_complaint['status'] == 'rejected')
+                  _buildPrimeTimelineItem(
+                    'Report Rejected',
+                    _complaint['remarks'] != null && _complaint['remarks'].toString().isNotEmpty
+                      ? 'Reason: ${_complaint['remarks']}'
+                      : 'This report was reviewed and marked as invalid or duplicate.',
+                    isCompleted: true,
+                    isLast: true,
+                    icon: Icons.cancel_rounded,
+                    color: const Color(0xFFEF4444),
+                  )
+                else
+                  _buildPrimeTimelineItem(
+                    _isClosed ? 'Session Closed' : 'Tracking Active',
+                    _isClosed ? 'The 2h resolution window has expired.' : 'Real-time monitoring is currently active.',
+                    isCompleted: _isClosed,
+                    isLast: true,
+                    icon: _isClosed ? Icons.lock_rounded : Icons.sensors_rounded,
+                    color: _isClosed ? const Color(0xFF64748B) : const Color(0xFF3B82F6),
+                  ),
 
                 const SizedBox(height: 48),
+
+                // Bank Response Card — always shown if remarks exist
+                if (_complaint['remarks'] != null && _complaint['remarks'].toString().isNotEmpty) ...[
+                  _buildPrimeSectionHeader('Bank Response'),
+                  const SizedBox(height: 16),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: _complaint['status'] == 'rejected'
+                          ? [const Color(0xFFFEF2F2), const Color(0xFFFFF5F5)]
+                          : [const Color(0xFFF0FDF4), const Color(0xFFF7FFFE)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: _complaint['status'] == 'rejected'
+                          ? const Color(0xFFEF4444).withOpacity(0.25)
+                          : const Color(0xFF10B981).withOpacity(0.25),
+                      ),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: _complaint['status'] == 'rejected'
+                              ? const Color(0xFFEF4444).withOpacity(0.1)
+                              : const Color(0xFF10B981).withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.mark_chat_read_rounded,
+                            size: 18,
+                            color: _complaint['status'] == 'rejected'
+                              ? const Color(0xFFEF4444)
+                              : const Color(0xFF10B981),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Message from Bank Manager',
+                                style: TextStyle(
+                                  color: _complaint['status'] == 'rejected'
+                                    ? const Color(0xFFEF4444)
+                                    : const Color(0xFF10B981),
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 12,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                _complaint['remarks'].toString(),
+                                style: const TextStyle(
+                                  color: Color(0xFF1E293B),
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14,
+                                  height: 1.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                ],
 
                 if (!_isClosed)
                   Container(

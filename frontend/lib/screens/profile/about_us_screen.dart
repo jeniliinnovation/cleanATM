@@ -36,13 +36,16 @@ class AboutUsScreen extends StatelessWidget {
                   color: AppColors.primary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(25),
                 ),
-                child: Image.asset('assets/images/logo.png', errorBuilder: (c, e, s) => const Icon(Icons.atm_rounded, size: 50, color: AppColors.primary)),
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  errorBuilder: (c, e, s) => const Icon(Icons.atm_rounded, size: 50, color: AppColors.primary),
+                ),
               ),
             ),
             const SizedBox(height: 24),
             const Text(
               'CleanATM',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Color(0xFF1E293B)),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
             ),
             const SizedBox(height: 8),
             Text(
@@ -55,7 +58,7 @@ class AboutUsScreen extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 15,
-                color: Color(0xFF64748B),
+                color: AppColors.textSecondary,
                 height: 1.6,
                 fontWeight: FontWeight.w500,
               ),
@@ -82,7 +85,7 @@ class AboutUsScreen extends StatelessWidget {
           children: [
             Text(
               title,
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFF334155)),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textDark),
             ),
             Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.grey.shade300),
           ],

@@ -551,7 +551,7 @@ class _FileReportScreenState extends State<FileReportScreen> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         gradient: const LinearGradient(
-          colors: [AppColors.primary, Color(0xFF22C55E)],
+          colors: [AppColors.primary, AppColors.primaryDark],
         ),
         boxShadow: [
           BoxShadow(

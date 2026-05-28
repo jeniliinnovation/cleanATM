@@ -75,17 +75,18 @@ class _SplashScreenState extends State<SplashScreen>
               children: [
                 // Illustration Container
                 Container(
-                  width: 140,
-                  height: 140,
+                  width: 280,
+                  height: 280,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF10B981).withOpacity(0.08),
+                    color: const Color(0xFF10B981).withOpacity(0.04),
                     shape: BoxShape.circle,
                   ),
                   child: Center(
-                    child: Icon(
-                      Icons.atm_rounded, 
-                      size: 80, 
-                      color: const Color(0xFF10B981).withOpacity(0.8)
+                    child: Image.asset(
+                      'assets/images/atm_clean_logo.png',
+                      width: 250,
+                      height: 250,
+                      fit: BoxFit.contain,
                     ),
                   ),
                 ),

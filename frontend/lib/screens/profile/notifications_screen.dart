@@ -52,7 +52,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         actions: [
           TextButton(
             onPressed: () {},
-            child: const Text('Mark all as read', style: TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.w800, fontSize: 13)),
+            child: const Text('Mark all as read', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800, fontSize: 13)),
           ),
           const SizedBox(width: 8),
         ],
@@ -80,16 +80,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case 'success':
       case 'resolved':
         icon = Icons.check_circle_rounded;
-        color = const Color(0xFF10B981);
+        color = AppColors.success;
         break;
       case 'warning':
       case 'in_progress':
         icon = Icons.hourglass_top_rounded;
-        color = const Color(0xFFF59E0B);
+        color = AppColors.warning;
         break;
       case 'error':
         icon = Icons.error_rounded;
-        color = const Color(0xFFEF4444);
+        color = AppColors.error;
         break;
       default:
         icon = Icons.notifications_rounded;
@@ -104,7 +104,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         decoration: BoxDecoration(
           color: isRead ? Colors.white : color.withOpacity(0.02),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: isRead ? const Color(0xFFF1F5F9) : color.withOpacity(0.1)),
+          border: Border.all(color: isRead ? AppColors.border : color.withOpacity(0.1)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,7 +124,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: isRead ? FontWeight.w600 : FontWeight.w800,
-                      color: const Color(0xFF334155),
+                      color: AppColors.textDark,
                       height: 1.4,
                     ),
                   ),
@@ -136,7 +136,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: Color(0xFFCBD5E1)),
+            const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: AppColors.borderMuted),
           ],
         ),
       ),
