@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../services/api_service.dart';
@@ -17,14 +18,32 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
   bool _isLoading = true;
   List<dynamic> _allComplaints = [];
   String _activeFilter = 'All';
+  Timer? _reloadTimer;
 
   @override
   void initState() {
     super.initState();
     _fetchComplaints();
+    _startAutoReload();
   }
 
-  Future<void> _fetchComplaints() async {
+  @override
+  void dispose() {
+    _reloadTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startAutoReload() {
+    _reloadTimer?.cancel();
+    _reloadTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      _fetchComplaints(silent: true);
+    });
+  }
+
+  Future<void> _fetchComplaints({bool silent = false}) async {
+    if (!silent) {
+      if (mounted) setState(() => _isLoading = true);
+    }
     try {
       final res = await ApiService.getComplaints();
       if (mounted) {
@@ -34,11 +53,11 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
             _isLoading = false;
           });
         } else {
-          setState(() => _isLoading = false);
+          if (!silent) setState(() => _isLoading = false);
         }
       }
     } catch (_) {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted && !silent) setState(() => _isLoading = false);
     }
   }
 
@@ -88,6 +107,21 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
           'Incident Lab',
           style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w900, fontSize: 20, letterSpacing: -0.8),
         ),
+        actions: [
+          IconButton(
+            onPressed: () => _fetchComplaints(),
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
+              ),
+              child: const Icon(Icons.refresh_rounded, color: AppColors.primary, size: 20),
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: Stack(
         children: [

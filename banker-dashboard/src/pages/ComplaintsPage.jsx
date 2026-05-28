@@ -17,6 +17,7 @@ import {
   Send,
   Filter,
   Image as ImageIcon,
+  RefreshCw,
 } from 'lucide-react';
 
 const STATUS_OPTIONS = ['pending', 'in_progress', 'resolved', 'rejected'];
@@ -45,9 +46,9 @@ export default function ComplaintsPage() {
   const { addToast } = useToast();
   const { user } = useAuth();
 
-  const fetchComplaints = useCallback(async (page = 1) => {
+  const fetchComplaints = useCallback(async (page = 1, silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       const params = { page };
       if (statusFilter) params.status = statusFilter;
       if (branchFilter) params.branch_code = branchFilter;
@@ -66,7 +67,14 @@ export default function ComplaintsPage() {
 
   useEffect(() => {
     fetchComplaints(1);
-  }, [fetchComplaints, branchFilter]);
+
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      fetchComplaints(pagination.page, true);
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [fetchComplaints, branchFilter, pagination.page]);
 
   useEffect(() => {
     const fetchBranches = async () => {
@@ -203,11 +211,19 @@ export default function ComplaintsPage() {
 
         {/* Table */}
         <div className="card">
-          <div className="card-header">
+          <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h3>
               <FileWarning size={18} style={{ marginRight: 8, verticalAlign: 'middle' }} />
               All Complaints ({pagination.total})
             </h3>
+            <button 
+              className="btn btn-ghost btn-sm" 
+              onClick={() => fetchComplaints(pagination.page)}
+              disabled={loading}
+              title="Reload List"
+            >
+              <RefreshCw size={16} className={loading ? 'spin' : ''} />
+            </button>
           </div>
 
           {loading ? (
